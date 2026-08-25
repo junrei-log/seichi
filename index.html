@@ -323,6 +323,19 @@
   }
   .memo{white-space:pre-wrap;margin:14px 0 0;font-size:14px;color:#33333a;}
   .meta{margin-top:14px;font-size:12px;color:var(--sub);}
+  .visit-wrap{padding:16px 18px 0;}
+  .visit-btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
+    padding:17px 16px;border-radius:15px;font-size:17px;font-weight:800;
+    background:var(--red);color:#fff;line-height:1.2;
+    box-shadow:0 5px 16px rgba(215,38,61,.30);transition:transform .08s;
+  }
+  .visit-btn .vi{width:22px;height:22px;flex:none;}
+  .visit-btn:active{transform:scale(.97);}
+  .visit-btn.again{
+    background:#fff;color:var(--red);border:2px solid var(--red);
+    box-shadow:none;font-size:16px;padding:15px 16px;
+  }
   .sheet-actions{display:flex;flex-wrap:wrap;gap:8px;padding:16px 18px 0;}
   .sheet-actions button{flex:1;min-width:120px;padding:12px;border-radius:12px;font-size:14px;font-weight:700;border:1px solid var(--line);}
   .act-visit{background:var(--red);color:#fff;border-color:var(--red)!important;}
@@ -804,7 +817,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.050";
+var APP_VERSION = "1.051";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -1737,6 +1750,14 @@ function openSheet(id){
      + '" target="_blank" rel="noopener" style="font-weight:700;text-decoration:none;">ルート案内</a></p>';
   h += '</div>';
 
+  // 訪問ボタンは押す機会がいちばん多いので、写真より前に大きく出す
+  var checkSvg = '<svg class="vi" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    + 'stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>';
+  h += '<div class="visit-wrap"><button class="visit-btn'+(rec.visits.length ? ' again' : '')+'" id="sVisit">'
+     + checkSvg
+     + (rec.visits.length ? 'また訪問した（'+(rec.visits.length+1)+'回目）' : '訪問済みにする')
+     + '</button></div>';
+
   // 誰でも写真を追加できる。削除できるのは入れた本人と管理キーのみ
   var myOnes = photos.filter(function(p){ return canDeletePhoto(s.id, p); });
   var hasRoom = photos.length < SHARED_PHOTO_MAX;
@@ -1758,9 +1779,7 @@ function openSheet(id){
   }
 
   h += '<div class="sheet-actions">';
-  h += '<button class="act-visit" id="sVisit">'
-     + (rec.visits.length ? 'また訪問した（'+(rec.visits.length+1)+'回目）' : '訪問済みにする')+'</button>';
-  h += '<button class="act-edit" id="sMyEdit">自分の記録</button>';
+  h += '<button class="act-edit" id="sMyEdit">自分の記録を編集</button>';
   if(canEditShared(s.id)){
     h += '<button class="act-edit" id="sEditShared">内容を編集</button>';
     h += '<button class="act-edit" id="sMove">位置を微調整</button>';
