@@ -68,16 +68,8 @@
   #suggest .s-item span{font-size:12px;color:var(--sub);}
   #suggest .s-head{padding:8px 16px;font-size:11px;font-weight:700;color:var(--sub);background:#f7f7f9;}
 
-  /* モード切替 */
-  .seg{display:flex;background:#fff;border-radius:999px;padding:4px;box-shadow:0 3px 14px rgba(0,0,0,.16);}
-  .seg button{
-    padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;
-    color:var(--sub);white-space:nowrap;
-  }
-  .seg button.on{background:var(--navy);color:#fff;}
-  #modeBar{position:absolute;top:calc(66px + var(--safe-t));left:50%;transform:translateX(-50%);z-index:5;}
   #filterBar{
-    position:absolute;top:calc(116px + var(--safe-t));left:50%;transform:translateX(-50%);z-index:5;
+    position:absolute;top:calc(66px + var(--safe-t));left:50%;transform:translateX(-50%);z-index:5;
     display:flex;align-items:center;gap:2px;background:var(--navy);color:#fff;border-radius:999px;
     padding:4px;box-shadow:0 3px 14px rgba(0,0,0,.22);max-width:calc(100% - 24px);
   }
@@ -92,8 +84,6 @@
   .fbsep{width:1px;align-self:stretch;background:rgba(255,255,255,.25);margin:4px 6px;}
   .fbcat{background:rgba(255,255,255,.22);border-radius:5px;padding:1px 7px;margin-right:6px;font-size:.9em;}
   .fbn{font-weight:400;opacity:.75;margin-left:6px;font-size:.9em;}
-  #listModeBar{margin-top:12px;box-shadow:none;background:#f1f1f4;}
-  #listModeBar button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.12);}
 
   .fab{
     position:absolute;right:12px;z-index:5;width:44px;height:44px;border-radius:12px;background:#fff;
@@ -366,13 +356,6 @@
   }
   .field input:focus,.field textarea:focus{border-color:var(--navy);background:#fff;}
   .field textarea{min-height:110px;resize:vertical;line-height:1.7;}
-  .destseg{display:flex;gap:8px;}
-  .destseg button{
-    flex:1;padding:12px 8px;border-radius:12px;border:1.5px solid var(--line);
-    background:#fafafb;font-size:14px;font-weight:700;color:var(--sub);text-align:center;line-height:1.4;
-  }
-  .destseg button small{display:block;font-size:10px;font-weight:400;margin-top:2px;}
-  .destseg button.on{border-color:var(--navy);background:#eaeef6;color:var(--navy);}
   .toggle{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fafafb;}
   .toggle span{font-size:15px;font-weight:600;}
   .sw{width:50px;height:30px;border-radius:999px;background:#d5d5db;position:relative;transition:.2s;flex:none;}
@@ -399,6 +382,19 @@
   .byline{display:flex;align-items:center;gap:8px;margin-top:12px;}
   .byline b{font-size:13px;font-weight:700;}
   .byline span{font-size:11px;color:var(--sub);}
+  .my-sec{padding:16px 18px 0;border-top:1px solid var(--line);margin-top:18px;}
+  .my-sec h4{margin:0 0 10px;font-size:13px;font-weight:800;color:var(--navy);}
+  .my-sec .mymemo{white-space:pre-wrap;margin:0 0 10px;font-size:14px;color:#33333a;}
+  .my-sec .myempty{margin:0 0 10px;font-size:12.5px;color:var(--sub);line-height:1.7;}
+  .my-sec .myphotos{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;}
+  .my-sec .myphotos img{width:84px;height:84px;object-fit:cover;border-radius:10px;flex:none;}
+  .my-sec .visitlog{margin:0 0 10px;font-size:12.5px;color:var(--sub);line-height:1.9;}
+  .orphan-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .orphan-row .oi{flex:1;min-width:0;}
+  .orphan-row .oi b{display:block;font-size:14px;}
+  .orphan-row .oi span{font-size:11.5px;color:var(--sub);}
+  .orphan-row button{flex:none;padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:#f6f6f8;}
+  .orphan-row button.reg{background:var(--navy);color:#fff;border-color:var(--navy);}
   .cmt-sec{padding:18px 18px 0;border-top:1px solid var(--line);margin-top:18px;}
   .cmt-sec h4{margin:0 0 12px;font-size:14px;font-weight:800;}
   .cmt{display:flex;gap:10px;margin-bottom:14px;}
@@ -440,7 +436,7 @@
     position:sticky;top:0;z-index:5;
   }
   .list-head h1{margin:0;font-size:20px;font-weight:800;}
-  .stats{display:flex;gap:8px;margin-top:12px;}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
   .stat{flex:1;background:#f6f6f8;border-radius:12px;padding:10px;text-align:center;}
   .stat b{display:block;font-size:20px;font-weight:800;color:var(--navy);}
   .stat span{font-size:11px;color:var(--sub);}
@@ -541,11 +537,6 @@
         <button id="addBtn">聖地を登録</button>
       </div>
 
-      <div class="seg" id="modeBar">
-        <button data-m="shared" class="on">みんなの聖地</button>
-        <button data-m="personal">自分の記録</button>
-      </div>
-
       <div id="filterBar" style="display:none;"></div>
 
       <div id="crosshair">
@@ -587,11 +578,7 @@
     <!-- ===== リスト ===== -->
     <div class="page" id="listPage">
       <div class="list-head">
-        <h1 id="listTitle">みんなの聖地</h1>
-        <div class="seg" id="listModeBar">
-          <button data-m="shared" class="on">みんなの聖地</button>
-          <button data-m="personal">自分の記録</button>
-        </div>
+        <h1 id="listTitle">聖地</h1>
         <div class="stats" id="stats"></div>
         <div class="bar" id="barWrap"><i id="stBar" style="width:0%"></i></div>
       </div>
@@ -608,7 +595,7 @@
     <div class="page" id="coursePage">
       <div class="list-head">
         <h1>モデルコース</h1>
-        <div style="font-size:11px;color:var(--sub);margin-top:4px;">みんなの聖地をつないだ、おすすめの巡り方</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:4px;">聖地をつないだ、おすすめの巡り方</div>
       </div>
       <div class="cards">
         <button class="newbtn" id="btnNewCourse">＋ コースを作る</button>
@@ -638,7 +625,7 @@
           <div id="cTotal" style="font-size:12px;color:var(--sub);margin-top:8px;"></div>
         </div>
         <div class="field">
-          <label>みんなの聖地から選ぶ</label>
+          <label>聖地から選ぶ</label>
           <input type="text" id="cSearch" placeholder="名前や作品でしぼりこむ">
           <div id="cPicker" style="max-height:46vh;overflow-y:auto;margin-top:8px;"></div>
         </div>
@@ -678,7 +665,7 @@
           <div><div>作品名をまとめる</div><small>表記ゆれを1つに統一します</small></div><div class="go">整理</div>
         </div>
         <div class="set-item admin-only" id="btnBackupAll" style="display:none;">
-          <div><div>みんなの聖地を丸ごと保存</div><small>聖地・コメント・コースをファイルに書き出します</small></div><div class="go">保存</div>
+          <div><div>聖地を丸ごと保存</div><small>聖地・コメント・コースをファイルに書き出します</small></div><div class="go">保存</div>
         </div>
         <div class="set-item admin-only" id="btnRestoreAll" style="display:none;">
           <div><div>丸ごと保存から復元</div><small>消えたものだけを戻します。今あるものは変わりません</small></div><div class="go">復元</div>
@@ -691,18 +678,21 @@
         <div class="set-item" id="btnImport">
           <div><div>バックアップから戻す</div><small>保存したファイルを読み込みます。いま入っている記録に追加されます</small></div><div class="go">読み込む</div>
         </div>
+        <div class="set-item" id="btnOrphans" style="display:none;">
+          <div><div>引き継げなかった記録</div><small id="orphanState">-</small></div><div class="go">確認</div>
+        </div>
       </div>
       <div class="set-sec">
         <div class="set-item" id="btnReset">
-          <div><div class="danger">自分の記録をすべて消す</div><small>元には戻せません。みんなの聖地のほうは消えません</small></div><div class="go danger">消す</div>
+          <div><div class="danger">自分の訪問記録をすべて消す</div><small>元には戻せません。聖地そのものは消えません</small></div><div class="go danger">消す</div>
         </div>
       </div>
       <div class="set-note">
-        <b>「自分の記録」について</b><br>
-        訪問日・写真・メモは、このスマホの中だけに保存されています。他の人には見えません。<br>
+        <b>自分だけに見えるもの</b><br>
+        訪問日・自分だけのメモ・自分だけの写真は、このスマホの中だけに保存されています。他の人には見えません。<br>
         スマホを買い替えたときや、ブラウザのデータを消したときに一緒に消えてしまうので、ときどきバックアップしておくと安心です。<br><br>
-        <b>「みんなの聖地」について</b><br>
-        登録した場所・写真・コメントは、このアプリを開いた人全員に見えます。自宅など、人に知られたくない場所は登録しないでください。<br><br>
+        <b>全員に見えるもの</b><br>
+        登録した聖地の名前・作品・住所・メモと、聖地に追加した写真・コメントは、このアプリを開いた人全員に見えます。自宅など、人に知られたくない場所は登録しないでください。<br><br>
         <b>使っている地図など</b><br>
         地図：MapLibre GL JS ／ OpenFreeMap（© OpenStreetMap contributors）／ 国土地理院<br>
         住所・地名の検索：Nominatim（OpenStreetMap）<br>
@@ -725,18 +715,11 @@
         <button id="fSave">保存</button>
       </div>
       <div class="form-body">
-        <div class="field" id="fDestField">
-          <label>登録先</label>
-          <div class="destseg">
-            <button data-d="shared" id="destShared">みんなの聖地<small>全員に公開される</small></button>
-            <button data-d="personal" id="destPersonal">自分の記録<small>この端末だけ</small></button>
-          </div>
-        </div>
-        <div class="field">
+        <div class="field" id="fNameField">
           <label>場所の名前 <span style="color:var(--red)">*</span></label>
           <input type="text" id="fName" placeholder="例：米花町交差点">
         </div>
-        <div class="field">
+        <div class="field" id="fWorksField">
           <label>作品（5つまで選べます）</label>
           <div id="fWorksSel"></div>
           <div class="sublabel">① カテゴリを選ぶ</div>
@@ -749,11 +732,11 @@
           </div>
           <p class="hint" id="fWorkHint" style="margin:8px 0 0;"></p>
         </div>
-        <div class="field">
+        <div class="field" id="fAddrField">
           <label>住所</label>
           <input type="text" id="fAddr" placeholder="地図の位置から自動で入ります">
         </div>
-        <div class="field">
+        <div class="field" id="fMemoField">
           <label id="fMemoLabel">メモ・感想</label>
           <textarea id="fMemo" placeholder="どのシーンの場所か、行ってみた感想など"></textarea>
         </div>
@@ -766,18 +749,12 @@
           <div class="photo-grid" id="fPhotos"></div>
           <input type="file" id="fPhotoInput" accept="image/*" multiple hidden>
         </div>
-        <div class="field" id="fVisitField">
-          <div class="toggle" id="fVisitToggle">
-            <span>訪問済みにする</span>
-            <div class="sw" id="fSw"></div>
-          </div>
-        </div>
         <div class="field" id="fVisitsField" style="display:none;">
-          <label>訪問日</label>
+          <label id="fVisitsLabel">訪問日</label>
           <div id="fVisits"></div>
           <button class="pickmap" id="fAddVisit">＋ 訪問日を追加</button>
         </div>
-        <div class="field">
+        <div class="field" id="fCoordField">
           <label>位置</label>
           <div class="coord" id="fCoord">-</div>
           <button class="pickmap" id="fPick">地図で位置を選び直す</button>
@@ -827,7 +804,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.049";
+var APP_VERSION = "1.050";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -837,9 +814,12 @@ var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
 "use strict";
 
 /* ================= 定数 ================= */
-var KEY_SPOTS = "conan-seichi-v1";
+var KEY_SPOTS = "conan-seichi-v1";        // 旧「自分の記録」。移行のためだけに読む
+var KEY_LOG   = "conan-seichi-log";       // 聖地ごとの自分の記録（訪問日・メモ・写真）
+var KEY_ORPHAN = "conan-seichi-orphans";  // 聖地とひもづかなかった昔の記録
+var KEY_MIGRATED = "conan-seichi-migrated";
+var KEY_VISITSYNC = "conan-seichi-visitsync";
 var KEY_STYLE = "conan-seichi-style";
-var KEY_MODE  = "conan-seichi-mode";
 var KEY_NICK  = "conan-seichi-nick";
 var KEY_TOKEN = "conan-seichi-tokens";
 var KEY_ADMIN = "conan-seichi-admin";
@@ -877,18 +857,17 @@ function styleById(id){
 }
 
 /* ================= 状態 ================= */
-var personal = [];
+var myLog    = {};   // 聖地ID -> { visits:[], memo:"", photos:[] }
+var orphans  = [];   // 移行できなかった昔の記録
 var shared   = [];
 var myTokens = {};
 var nickname = localStorage.getItem(KEY_NICK) || "";
 var adminKey = localStorage.getItem(KEY_ADMIN) || "";
 var moveTarget = null;
-var MODE     = localStorage.getItem(KEY_MODE) || "shared";
 var styleKey = localStorage.getItem(KEY_STYLE) || STYLES[0].id;
 var filter   = "all";
 var editingId = null;
 var draft = null;
-var dest = "personal";
 var pickMode = false, pickReturn = null;
 var map = null, markers = {};
 var sharedReady = false;
@@ -897,7 +876,7 @@ var courseView = null;     // 表示中のコース
 var courseTokens = {};     // 自分が作ったコースの鍵
 
 function hasServer(){ return !!(SUPABASE_URL && SUPABASE_ANON_KEY); }
-function rawList(){ return MODE === "shared" ? shared : personal; }
+function rawList(){ return shared; }
 
 /* 作品でしぼりこむ。作品名は複数持てる */
 var workFilter = null;                     // null = すべて
@@ -1040,10 +1019,10 @@ function workList(){
   return Object.keys(m).sort(function(a,b){ return m[b]-m[a] || a.localeCompare(b,"ja"); })
     .map(function(w){ return { name:w, n:m[w] }; });
 }
-/* みんなの聖地と自分の記録の両方から、作品名の候補を集める */
+/* 登録済みの聖地から、作品名の候補を集める */
 function allWorkNames(){
   var m = {};
-  shared.concat(personal).forEach(function(s){
+  shared.forEach(function(s){
     worksOf(s).forEach(function(w){ m[w] = (m[w]||0) + 1; });
   });
   return Object.keys(m).sort(function(a,b){ return m[b]-m[a] || a.localeCompare(b,"ja"); });
@@ -1058,22 +1037,55 @@ function baseList(){
 /* 訪問状態のしぼりこみも反映した一覧。地図のピンもこれに従う */
 function currentList(){
   var l = baseList();
-  if(courseView || MODE !== "personal" || filter === "all") return l;
-  if(filter === "visited") return l.filter(function(s){ return s.visited; });
-  return l.filter(function(s){ return !s.visited; });
+  if(courseView || filter === "all") return l;
+  if(filter === "visited") return l.filter(isVisited);
+  return l.filter(function(s){ return !isVisited(s); });
 }
 
 /* ================= 保存まわり ================= */
 function loadLocal(){
-  try{ personal = JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]"); }catch(e){ personal = []; }
-  if(!Array.isArray(personal)) personal = [];
-  personal.forEach(migrateVisits);
+  try{ myLog = JSON.parse(localStorage.getItem(KEY_LOG) || "{}"); }catch(e){ myLog = {}; }
+  if(!myLog || typeof myLog !== "object" || Array.isArray(myLog)) myLog = {};
+  Object.keys(myLog).forEach(function(k){ normLog(myLog[k]); });
+  try{ orphans = JSON.parse(localStorage.getItem(KEY_ORPHAN) || "[]"); }catch(e){ orphans = []; }
+  if(!Array.isArray(orphans)) orphans = [];
   try{ myTokens = JSON.parse(localStorage.getItem(KEY_TOKEN) || "{}"); }catch(e){ myTokens = {}; }
   if(!myTokens || typeof myTokens !== "object") myTokens = {};
 }
-function saveLocal(){
-  try{ localStorage.setItem(KEY_SPOTS, JSON.stringify(personal)); return true; }
-  catch(e){ toast("この端末の保存容量がいっぱいです。写真を減らすか、古い記録を整理してください"); return false; }
+
+/* ---- 聖地ごとの「自分の記録」 ----
+   訪問日・自分だけのメモ・自分だけの写真。この端末の中だけに置く */
+function normLog(r){
+  if(!r || typeof r !== "object") return { visits:[], memo:"", photos:[] };
+  if(!Array.isArray(r.visits)) r.visits = [];
+  r.visits = uniqSorted(r.visits);
+  if(!Array.isArray(r.photos)) r.photos = [];
+  if(typeof r.memo !== "string") r.memo = "";
+  return r;
+}
+var EMPTY_LOG = { visits:[], memo:"", photos:[] };
+function logOf(id){
+  var r = myLog[String(id)];
+  return r ? r : EMPTY_LOG;
+}
+function ensureLog(id){
+  id = String(id);
+  if(!myLog[id]) myLog[id] = { visits:[], memo:"", photos:[] };
+  return normLog(myLog[id]);
+}
+/* 中身が空になったら持たない（バックアップを小さく保つ） */
+function pruneLog(id){
+  var r = myLog[String(id)];
+  if(r && !r.visits.length && !r.memo && !r.photos.length) delete myLog[String(id)];
+}
+function isVisited(s){ return logOf(s && s.id).visits.length > 0; }
+function visitsOf(s){ return logOf(s && s.id).visits; }
+function saveLog(){
+  try{ localStorage.setItem(KEY_LOG, JSON.stringify(myLog)); return true; }
+  catch(e){ toast("この端末の保存容量がいっぱいです。自分の写真を減らしてください"); return false; }
+}
+function saveOrphans(){
+  try{ localStorage.setItem(KEY_ORPHAN, JSON.stringify(orphans)); }catch(e){}
 }
 function saveTokens(){ try{ localStorage.setItem(KEY_TOKEN, JSON.stringify(myTokens)); }catch(e){} }
 /* 訪問履歴：visits は ["2026-08-13", "2026-09-01", ...]（昇順）。
@@ -1082,13 +1094,11 @@ function uniqSorted(arr){
   return (arr || []).filter(Boolean).sort()
     .filter(function(d,i,a){ return i === 0 || d !== a[i-1]; });
 }
-function migrateVisits(s){
-  if(!s) return s;
-  if(!Array.isArray(s.visits)) s.visits = s.date ? [s.date] : [];
-  s.visits = uniqSorted(s.visits);
-  s.visited = s.visits.length > 0;
-  s.date = s.visits[0] || "";
-  return s;
+/* 昔の記録から訪問日を取り出す（移行とバックアップ読み込みで使う） */
+function oldVisits(p){
+  if(!p) return [];
+  var v = Array.isArray(p.visits) ? p.visits.slice() : (p.date ? [p.date] : []);
+  return uniqSorted(v);
 }
 function visitLabel(i){ return i === 0 ? "初回" : (i+1) + "回目"; }
 function today(){ return new Date().toISOString().slice(0,10); }
@@ -1281,7 +1291,7 @@ function sbRemovePhoto(id, url, token, cb){
     .then(function(ok){ cb(ok === true); })
     .catch(function(){ cb(false); });
 }
-/* 自分の記録に追加した／取り消したことを記録し、人数を返す */
+/* 訪問済みにした／取り消したことを記録し、人数を返す */
 function sbSetAdded(id, added, cb){
   if(!hasServer()){ if(cb) cb(-1); return; }
   fetch(sbBase() + "/rest/v1/rpc/set_spot_added",
@@ -1489,9 +1499,6 @@ function timeAgo(iso){
    ピンの登録者でも、他人が入れた写真は消せない */
 function canDeletePhoto(id, url){ return !!adminKey || myPhotoUrls.indexOf(url) >= 0; }
 
-function alreadyCopied(sharedId){
-  return personal.some(function(p){ return p.fromShared === sharedId; });
-}
 function numPinEl(n){
   var el = document.createElement("div");
   el.className = "num-pin";
@@ -1513,13 +1520,10 @@ function photoLimit(){
 var markerSpot = {}, markerLook = {};
 
 function ringClass(s){
-  if(MODE === "shared") return alreadyCopied(s.id) ? "ring-red" : "ring-navy";
-  return s.visited ? "ring-red" : "";
+  return isVisited(s) ? "ring-red" : "ring-navy";
 }
 function pinKindOf(s){
-  return MODE === "shared"
-    ? (alreadyCopied(s.id) ? "added" : "shared")
-    : (s.visited ? "visited" : "todo");
+  return isVisited(s) ? "visited" : "shared";
 }
 /* マーカーの要素は作り直さず、中身だけ差し替える
    （作り直すと MapLibre が付けた位置の指定が外れてピンがずれる） */
@@ -1657,27 +1661,6 @@ function flyTo(lat, lng, zoom){
   map.easeTo({ center:[lng, lat], zoom: Math.max(map.getZoom(), zoom||15), duration:600 });
 }
 
-/* ================= モード切替 ================= */
-function setMode(m, quiet){
-  if(MODE !== m){ workFilter = null; updateWorkBtn(); }
-  MODE = m;
-  localStorage.setItem(KEY_MODE, m);
-  Array.prototype.forEach.call(document.querySelectorAll(".seg button[data-m]"), function(b){
-    b.classList.toggle("on", b.dataset.m === m);
-  });
-  document.getElementById("listTitle").textContent = (m === "shared") ? "みんなの聖地" : "自分の記録";
-  document.getElementById("filters").style.display = (m === "shared") ? "none" : "flex";
-  document.getElementById("barWrap").style.display = (m === "shared") ? "none" : "block";
-  closeSheet();
-  renderMarkers();
-  renderList();
-  if(!quiet) fitAll();
-  if(m === "shared" && hasServer() && !sharedReady) sbLoad(function(){ renderMarkers(); renderList(); });
-}
-Array.prototype.forEach.call(document.querySelectorAll(".seg button[data-m]"), function(b){
-  b.addEventListener("click", function(){ setMode(b.dataset.m); });
-});
-
 /* ================= 画面切り替え ================= */
 var PAGES = ["mapPage","listPage","coursePage","setPage"];
 function showPage(id){
@@ -1702,13 +1685,16 @@ var sheetBody = document.getElementById("sheetBody");
 function findSpot(id){
   var l = currentList();
   for(var i=0;i<l.length;i++) if(String(l[i].id) === String(id)) return l[i];
+  // しぼりこみから外れた場合でも、開いている聖地は表示し続ける
+  for(var j=0;j<shared.length;j++) if(String(shared[j].id) === String(id)) return shared[j];
   return null;
 }
 function openSheet(id){
   var s = findSpot(id);
   if(!s) return;
-  var isShared = MODE === "shared";
   var photos = safePhotos(s.photos);
+  var rec = logOf(s.id);
+  var myPhotos = safePhotos(rec.photos);
   var h = "";
 
   if(photos.length){
@@ -1724,36 +1710,22 @@ function openSheet(id){
          + photos.map(function(_,i){ return '<i class="'+(i===0?"on":"")+'"></i>'; }).join("")
          + '</div>';
     }
-    if(isShared) h += '<div class="photo-by" id="photoBy"></div>';
+    h += '<div class="photo-by" id="photoBy"></div>';
   }
   h += '<div class="sheet-pad">';
-  h += '<div class="sheet-title"><h2>'+(isShared ? newBadge(s) : "")+esc(s.name)+'</h2>'
+  h += '<div class="sheet-title"><h2>'+newBadge(s)+esc(s.name)+'</h2>'
      + '<button class="closeX" id="sClose">×</button></div>';
   if(worksOf(s).length) h += '<p class="work">'+workLabelHtml(s)+'</p>';
   if(s.addr) h += '<p class="work" style="font-size:12px;">📍 '+esc(s.addr)+'</p>';
 
-  if(isShared){
-    h += alreadyCopied(s.id)
-      ? '<span class="badge on">✓ 自分の記録に追加済み</span>'
-      : '<span class="badge share">みんなの聖地</span>';
-    if(s.add_count > 0){
-      h += ' <span class="badge count">'+s.add_count+'人が追加済み</span>';
-    }
-  }else{
-    migrateVisits(s);
-    h += s.visits.length
-      ? '<span class="badge on">✓ 訪問済み・'+s.visits.length+'回</span>'
-      : '<span class="badge off">未訪問</span>';
-    if(s.fromShared) h += ' <span class="badge share">みんなの聖地から</span>';
-    if(s.visits.length){
-      h += '<p class="meta" style="margin-top:10px;">'
-         + s.visits.map(function(d,i){ return visitLabel(i)+' '+esc(fmtDate(d)); }).join('　／　')
-         + '</p>';
-    }
-  }
+  h += rec.visits.length
+    ? '<span class="badge on">✓ 訪問済み・'+rec.visits.length+'回</span>'
+    : '<span class="badge off">未訪問</span>';
+  if(s.add_count > 0) h += ' <span class="badge count">'+s.add_count+'人が訪問</span>';
+
   if(s.memo) h += '<p class="memo">'+esc(s.memo)+'</p>';
   // 登録者がいない聖地（最初から用意されているもの）は登録者行を出さない
-  if(isShared && (s.author || s.author_id)){
+  if(s.author || s.author_id){
     h += '<div class="byline">' + avatarHtml(s.author_id, s.author)
        + '<div><b>'+esc(displayName(s.author_id, s.author))+'</b>'
        + '<span> が登録　'+esc(timeAgo(s.created_at))+'</span></div></div>';
@@ -1765,57 +1737,62 @@ function openSheet(id){
      + '" target="_blank" rel="noopener" style="font-weight:700;text-decoration:none;">ルート案内</a></p>';
   h += '</div>';
 
-  if(isShared){
-    // 空きがあれば誰でも追加できる。削除できるのは登録者・入れた本人・管理キーのみ
-    var myOnes = photos.filter(function(p){ return canDeletePhoto(s.id, p); });
-    var hasRoom = photos.length < SHARED_PHOTO_MAX;
-    if(hasRoom || myOnes.length){
-      h += '<div class="thumbs">';
-      photos.forEach(function(p,i){
-        if(!canDeletePhoto(s.id, p)) return;
-        h += '<div class="ph-wrap"><img src="'+esc(p)+'" alt="" data-lb="'+i+'"><button data-ph="'+i+'">×</button></div>';
-      });
-      if(hasRoom){
-        h += '<button class="photo-add" id="sAddPhoto"><span style="font-size:20px;">＋</span>写真</button>';
-      }
-      h += '</div>';
-      h += '<p class="meta" style="padding:0 18px;">'
-         + (hasRoom
-             ? 'あと'+(SHARED_PHOTO_MAX - photos.length)+'枚まで、誰でも写真を追加できます'
-             : '写真は'+SHARED_PHOTO_MAX+'枚そろっています')
-         + '</p>';
+  // 誰でも写真を追加できる。削除できるのは入れた本人と管理キーのみ
+  var myOnes = photos.filter(function(p){ return canDeletePhoto(s.id, p); });
+  var hasRoom = photos.length < SHARED_PHOTO_MAX;
+  if(hasRoom || myOnes.length){
+    h += '<div class="thumbs">';
+    photos.forEach(function(p,i){
+      if(!canDeletePhoto(s.id, p)) return;
+      h += '<div class="ph-wrap"><img src="'+esc(p)+'" alt="" data-lb="'+i+'"><button data-ph="'+i+'">×</button></div>';
+    });
+    if(hasRoom){
+      h += '<button class="photo-add" id="sAddPhoto"><span style="font-size:20px;">＋</span>写真</button>';
     }
+    h += '</div>';
+    h += '<p class="meta" style="padding:0 18px;">'
+       + (hasRoom
+           ? 'あと'+(SHARED_PHOTO_MAX - photos.length)+'枚まで、誰でも写真を追加できます（全員に公開されます）'
+           : 'みんなの写真は'+SHARED_PHOTO_MAX+'枚そろっています')
+       + '</p>';
   }
 
   h += '<div class="sheet-actions">';
-  if(isShared){
-    h += alreadyCopied(s.id)
-      ? '<button class="act-edit" id="sOpenPersonal">自分の記録で開く</button>'
-      : '<button class="act-main" id="sCopy">自分の記録に追加</button>';
-    if(canEditShared(s.id)){
-      h += '<button class="act-edit" id="sEditShared">内容を編集</button>';
-      h += '<button class="act-edit" id="sMove">位置を微調整</button>';
-      h += '<button class="act-del" id="sDelShared">🗑</button>';
-    }
-  }else{
-    h += '<button class="act-visit" id="sVisit">'
-       + (s.visits.length ? 'また訪問した（'+(s.visits.length+1)+'回目）' : '訪問済みにする')+'</button>';
-    h += '<button class="act-edit" id="sEdit">編集</button>';
+  h += '<button class="act-visit" id="sVisit">'
+     + (rec.visits.length ? 'また訪問した（'+(rec.visits.length+1)+'回目）' : '訪問済みにする')+'</button>';
+  h += '<button class="act-edit" id="sMyEdit">自分の記録</button>';
+  if(canEditShared(s.id)){
+    h += '<button class="act-edit" id="sEditShared">内容を編集</button>';
     h += '<button class="act-edit" id="sMove">位置を微調整</button>';
-    h += '<button class="act-del" id="sDel">🗑</button>';
-    if(!s.fromShared) h += '<button class="act-edit" id="sShare">みんなの聖地にも登録</button>';
+    h += '<button class="act-del" id="sDelShared">🗑</button>';
   }
   h += '</div>';
 
-  if(isShared){
-    h += '<div class="cmt-sec">'
-       + '<h4>コメント</h4>'
-       + '<div id="cmtList"><p class="cmt-empty">読み込み中…</p></div>'
-       + '<div class="cmt-form">'
-       + '<textarea id="cmtInput" placeholder="この場所の情報や感想を書く" maxlength="500"></textarea>'
-       + '<button id="cmtSend">送信</button>'
-       + '</div></div>';
+  // ---- ここから下は自分だけに見える ----
+  h += '<div class="my-sec"><h4>自分の記録（この端末だけ）</h4>';
+  if(rec.visits.length){
+    h += '<p class="visitlog">'
+       + rec.visits.map(function(d,i){ return visitLabel(i)+' '+esc(fmtDate(d)); }).join('　／　')
+       + '</p>';
   }
+  if(rec.memo) h += '<p class="mymemo">'+esc(rec.memo)+'</p>';
+  if(myPhotos.length){
+    h += '<div class="myphotos" id="myGal">'
+       + myPhotos.map(function(u,i){ return '<img src="'+esc(u)+'" alt="" data-my="'+i+'" loading="lazy">'; }).join("")
+       + '</div>';
+  }
+  if(!rec.visits.length && !rec.memo && !myPhotos.length){
+    h += '<p class="myempty">訪問日・自分だけのメモ・自分だけの写真をここに残せます。他の人には見えません。</p>';
+  }
+  h += '</div>';
+
+  h += '<div class="cmt-sec">'
+     + '<h4>コメント</h4>'
+     + '<div id="cmtList"><p class="cmt-empty">読み込み中…</p></div>'
+     + '<div class="cmt-form">'
+     + '<textarea id="cmtInput" placeholder="この場所の情報や感想を書く" maxlength="500"></textarea>'
+     + '<button id="cmtSend">送信</button>'
+     + '</div></div>';
 
   sheetBody.innerHTML = h;
   sheetBody.scrollTop = 0;
@@ -1835,9 +1812,17 @@ function openSheet(id){
       openLightbox(photos, +im.dataset.lb);
     });
   }
+  var myGalEl = document.getElementById("myGal");
+  if(myGalEl){
+    myGalEl.addEventListener("click", function(e){
+      var im = e.target.closest("img[data-my]");
+      if(!im) return;
+      openLightbox(myPhotos, +im.dataset.my);
+    });
+  }
 
   // 写真を入れた人の表示
-  if(isShared && photos.length){
+  if(photos.length){
     photoOwnerMap = {};
     photoIndex = 0;
     updatePhotoBy(s, photos);
@@ -1888,7 +1873,6 @@ function openSheet(id){
       sbRemovePhoto(s.id, url, photoToken(s.id), function(ok){
         if(!ok){ toast("削除できませんでした（権限がない可能性があります）"); return; }
         forgetMyPhoto(url);
-        syncPhotosToPersonal(s.id, [url], false);
         sbLoad(function(){
           renderMarkers(); renderList();
           toast("写真を削除しました");
@@ -1898,50 +1882,31 @@ function openSheet(id){
     };
   });
 
-  if(isShared){
-    var cp = document.getElementById("sCopy");
-    if(cp) cp.onclick = function(){ copyToPersonal(s); };
-    var op = document.getElementById("sOpenPersonal");
-    if(op) op.onclick = function(){
-      var mine = personal.filter(function(p){ return p.fromShared === s.id; })[0];
-      closeSheet(); setMode("personal", true);
-      if(mine) setTimeout(function(){ openSheet(mine.id); }, 150);
-    };
-    var ds = document.getElementById("sDelShared");
-    if(ds) ds.onclick = function(){
-      if(!confirm("みんなの聖地から「"+s.name+"」を削除しますか？")) return;
-      sbDelete(s.id, sharedToken(s.id), function(ok){
-        if(!ok){ toast("削除できませんでした"); return; }
-        delete myTokens[s.id]; saveTokens();
-        sbLoad(function(){ renderMarkers(); renderList(); });
-        closeSheet(); toast("削除しました");
-      });
-    };
-  }else{
-    document.getElementById("sVisit").onclick = function(){
-      var t = today();
-      if(s.visits.indexOf(t) >= 0){
-        toast("今日の訪問はすでに記録されています");
-        return;
-      }
-      s.visits.push(t);
-      migrateVisits(s);
-      saveLocal(); renderMarkers(); renderList(); openSheet(id);
-      toast(s.visits.length === 1 ? "訪問済みにしました" : s.visits.length + "回目の訪問を記録しました");
-    };
-    document.getElementById("sEdit").onclick = function(){ closeSheet(); openForm(id); };
-    document.getElementById("sDel").onclick = function(){
-      if(!confirm("「"+s.name+"」を自分の記録から削除しますか？")) return;
-      var fromId = s.fromShared;
-      personal = personal.filter(function(x){ return x.id!==id; });
-      saveLocal(); renderMarkers(); closeSheet(); renderList(); toast("削除しました");
-      if(fromId && !alreadyCopied(fromId)) sbSetAdded(fromId, false, function(){ renderList(); });
-    };
-    var sh = document.getElementById("sShare");
-    if(sh) sh.onclick = function(){ shareExisting(s); };
-  }
+  var ds = document.getElementById("sDelShared");
+  if(ds) ds.onclick = function(){
+    if(!confirm("「"+s.name+"」を聖地の一覧から削除しますか？\n全員から見えなくなります")) return;
+    sbDelete(s.id, sharedToken(s.id), function(ok){
+      if(!ok){ toast("削除できませんでした"); return; }
+      delete myTokens[s.id]; saveTokens();
+      sbLoad(function(){ renderMarkers(); renderList(); });
+      closeSheet(); toast("削除しました");
+    });
+  };
 
-  if(isShared) setupComments(s);
+  document.getElementById("sVisit").onclick = function(){
+    var t = today();
+    var r = ensureLog(s.id);
+    if(r.visits.indexOf(t) >= 0){ toast("今日の訪問はすでに記録されています"); return; }
+    var first = r.visits.length === 0;
+    r.visits.push(t); r.visits = uniqSorted(r.visits);
+    if(!saveLog()) return;
+    if(first) sbSetAdded(s.id, true, function(){ renderList(); });
+    renderMarkers(); renderList(); openSheet(id);
+    toast(first ? "訪問済みにしました" : r.visits.length + "回目の訪問を記録しました");
+  };
+  document.getElementById("sMyEdit").onclick = function(){ closeSheet(); openLogForm(s); };
+
+  setupComments(s);
 
   if(document.getElementById("mapPage").classList.contains("active")) flyTo(s.lat, s.lng, 15);
 }
@@ -2126,34 +2091,11 @@ function setupComments(s){
 var photoTarget = null;
 var sharedPhotoInput = document.getElementById("sharedPhotoInput");
 
-/* 共有に入れた自分の写真を、自分の記録にも入れる（取り消したら外す） */
-function syncPhotosToPersonal(sharedId, urls, add){
-  var changed = false;
-  personal.forEach(function(p){
-    if(p.fromShared !== sharedId) return;
-    if(!Array.isArray(p.photos)) p.photos = [];
-    if(add){
-      urls.forEach(function(u){
-        if(p.photos.indexOf(u) < 0 && p.photos.length < PERSONAL_PHOTO_MAX){
-          p.photos.push(u); changed = true;
-        }
-      });
-    }else{
-      var before = p.photos.length;
-      p.photos = p.photos.filter(function(u){ return urls.indexOf(u) < 0; });
-      if(p.photos.length !== before) changed = true;
-    }
-  });
-  if(changed) saveLocal();
-  return changed;
-}
-
 function addSharedPhotos(s, urls){
   toast("反映中…");
   sbAppendPhotos(s.id, urls, photoToken(s.id), function(ok){
     if(!ok){ toast("追加できませんでした。ほかの人が先に埋めたかもしれません"); return; }
     rememberMyPhotos(urls);
-    syncPhotosToPersonal(s.id, urls, true);
     sbLoad(function(){
       renderMarkers(); renderList();
       toast("写真を追加しました");
@@ -2241,57 +2183,6 @@ sheetMask.addEventListener("click", closeSheet);
   sheet.addEventListener("touchcancel", endDrag);
 })();
 
-/* 共有 → 自分の記録へコピー */
-function copyToPersonal(s){
-  var rec = {
-    id: uid(), created: Date.now(), fromShared: s.id,
-    name: s.name, works: worksOf(s).slice(), work: (worksOf(s)[0] || ""),
-    addr: s.addr || "", memo: s.memo || "",
-    visited: false, date: "", visits: [], lat: s.lat, lng: s.lng, photos: []
-  };
-  personal.push(rec);
-  if(!saveLocal()) return;
-  sbSetAdded(s.id, true, function(){ renderList(); });
-  renderMarkers(); renderList();
-  closeSheet();
-  setMode("personal", true);
-  toast("自分の記録に追加しました");
-  setTimeout(function(){ openForm(rec.id); }, 200);
-}
-
-/* 自分の記録 → みんなの聖地へ登録 */
-function shareExisting(s){
-  if(!hasServer()){ toast("オンラインにつながっていません"); return; }
-  if(!confirm("「"+s.name+"」をみんなの聖地に登録します。名前・作品・住所・メモが全員に公開されます。よろしいですか？")) return;
-  askNickname(function(nick){
-    var token = randToken();
-    var pics = (s.photos || []).filter(function(p){ return /^data:/.test(p); }).slice(0, SHARED_PHOTO_MAX);
-    toast(pics.length ? "写真を送信中…" : "登録中…");
-    sbUploadAll(pics, function(urls){
-    sbInsert({
-      name: s.name.slice(0,80), work: (worksOf(s)[0]||"").slice(0,60), works: worksOf(s).slice(0, WORKS_MAX),
-      addr: (s.addr||"").slice(0,200),
-      memo: (s.memo||"").slice(0,1000), lat: s.lat, lng: s.lng,
-      author: nick.slice(0,40), author_id: myUid, edit_token: token, photos: urls
-    }, function(ok){
-      if(!ok){ toast("登録できませんでした"); return; }
-      toast("みんなの聖地に登録しました");
-      sbLoad(function(){
-        var mine = shared.filter(function(x){
-          return x.name === s.name && Math.abs(x.lat - s.lat) < 1e-6;
-        })[0];
-        if(mine){
-          myTokens[mine.id] = token; saveTokens();
-          s.fromShared = mine.id;   // もとの記録をみんなの聖地とひも付ける
-          saveLocal();
-        }
-        rememberMyPhotos(urls || []);
-        renderMarkers(); renderList();
-      });
-    });
-    });
-  });
-}
 function askNickname(cb){
   if(nickname){ cb(nickname); return; }
   var n = prompt("登録者名（ニックネーム）を入力してください", "");
@@ -2316,7 +2207,7 @@ searchInput.addEventListener("input", function(){
   }).slice(0, 8);
   var h = "";
   if(hits.length){
-    h += '<div class="s-head">'+(MODE==="shared"?"みんなの聖地":"自分の記録")+'</div>';
+    h += '<div class="s-head">聖地</div>';
     h += hits.map(function(s){
       return '<div class="s-item" data-id="'+esc(s.id)+'><b>'+esc(s.name)+'</b><span>'+workLabelHtml(s)+'</span></div>';
     }).join("");
@@ -2431,7 +2322,7 @@ function updateWorkBtn(){
 function updateFilterBar(){
   var bar = document.getElementById("filterBar");
   if(!bar) return;
-  var visitOn = (MODE === "personal" && filter !== "all");
+  var visitOn = (filter !== "all");
   if((!workFilter && !visitOn) || courseView || pickMode){ bar.style.display = "none"; return; }
 
   var h = "";
@@ -2478,7 +2369,7 @@ document.getElementById("filterBar").addEventListener("click", function(e){
       x.classList.toggle("on", x.dataset.f === "all");
     });
     renderMarkers(); renderList(); updateFilterBar();
-    toast("すべての記録を表示します");
+    toast("すべての聖地を表示します");
   }
 });
 function renderWorkSheet(){
@@ -2550,19 +2441,17 @@ styleSheet.addEventListener("click", function(e){
 var addBanner = document.getElementById("addBanner");
 var crosshair = document.getElementById("crosshair");
 var formPage  = document.getElementById("formPage");
-var modeBar   = document.getElementById("modeBar");
 
 function chrome(){
   var busy = pickMode || formPage.style.display === "flex";
   document.getElementById("nav").style.display = busy ? "none" : "flex";
-  modeBar.style.display = pickMode ? "none" : "flex";
   updateFilterBar();
   if(map) setTimeout(function(){ map.resize(); }, 60);
 }
 /* ピンの位置を微調整するモード */
 function startMove(s){
   if(!map){ toast("地図の準備ができていません"); return; }
-  moveTarget = { id:s.id, mode:MODE, name:s.name };
+  moveTarget = { id:s.id, name:s.name };
   startPick("move", "拡大して、ピン先を正確な位置に合わせてください");
   map.jumpTo({ center:[s.lng, s.lat], zoom: Math.max(map.getZoom(), 18) });
   document.getElementById("addNext").textContent = "この位置に決定";
@@ -2571,25 +2460,15 @@ function finishMove(lat, lng){
   var t = moveTarget; moveTarget = null;
   document.getElementById("addNext").textContent = "ここに登録";
   if(!t) return;
-  if(t.mode === "personal"){
-    personal = personal.map(function(p){
-      if(p.id === t.id){ p.lat = lat; p.lng = lng; }
-      return p;
+  toast("更新中…");
+  sbUpdatePos(t.id, sharedToken(t.id), lat, lng, function(ok){
+    if(!ok){ toast("更新できませんでした（権限がない可能性があります）"); return; }
+    sbLoad(function(){
+      renderMarkers(); renderList();
+      toast("位置を更新しました");
+      setTimeout(function(){ openSheet(t.id); }, 200);
     });
-    saveLocal(); renderMarkers();
-    toast("位置を更新しました");
-    setTimeout(function(){ openSheet(t.id); }, 200);
-  }else{
-    toast("更新中…");
-    sbUpdatePos(t.id, sharedToken(t.id), lat, lng, function(ok){
-      if(!ok){ toast("更新できませんでした（権限がない可能性があります）"); return; }
-      sbLoad(function(){
-        renderMarkers(); renderList();
-        toast("位置を更新しました");
-        setTimeout(function(){ openSheet(t.id); }, 200);
-      });
-    });
-  }
+  });
 }
 
 function startPick(mode, text){
@@ -2662,31 +2541,21 @@ var fName = document.getElementById("fName"),
     fAddr = document.getElementById("fAddr"),
     fMemo = document.getElementById("fMemo"),
     fAuthor = document.getElementById("fAuthor"),
-    fSw   = document.getElementById("fSw"),
     fPhotosEl = document.getElementById("fPhotos"),
     fPhotoInput = document.getElementById("fPhotoInput");
 
-function setDest(d){
-  dest = d;
-  document.getElementById("destShared").classList.toggle("on", d==="shared");
-  document.getElementById("destPersonal").classList.toggle("on", d==="personal");
-  var isShared = d === "shared";
-  document.getElementById("fAuthorField").style.display = isShared ? "block" : "none";
-  document.getElementById("fPhotoField").style.display  = "block";
-  document.getElementById("fPhotoLabel").textContent =
-    isShared ? "写真（" + SHARED_PHOTO_MAX + "枚まで・全員に公開されます）"
-             : "写真（" + PERSONAL_PHOTO_MAX + "枚まで）";
-  document.getElementById("fVisitField").style.display  = isShared ? "none" : "block";
-  document.getElementById("fVisitsField").style.display  = (!isShared && draft && draft.visits && draft.visits.length) ? "block" : "none";
-  document.getElementById("fMemoLabel").textContent = isShared ? "メモ（どのシーンの場所か）" : "メモ・感想";
-  fMemo.placeholder = isShared ? "どの作品のどんなシーンに出てくるかを書くと親切です" : "行ってみた感想など";
-}
-Array.prototype.forEach.call(document.querySelectorAll(".destseg button"), function(b){
-  b.addEventListener("click", function(){
-    if(b.dataset.d === "shared" && !hasServer()){ toast("オンラインにつながっていません"); return; }
-    setDest(b.dataset.d);
+/* フォームは3つの使い方をする：
+   ・聖地を新しく登録する
+   ・聖地の内容を編集する（editingShared）
+   ・自分の記録を編集する（editingLog） */
+var FORM_FIELDS = ["fNameField","fWorksField","fAddrField","fMemoField",
+                   "fAuthorField","fPhotoField","fVisitsField","fCoordField"];
+function showFields(list){
+  FORM_FIELDS.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = (list.indexOf(id) >= 0) ? "block" : "none";
   });
-});
+}
 
 /* ---- 作品名の選択UI ---- */
 var formCat = "劇場版";
@@ -2792,22 +2661,23 @@ document.getElementById("fWorkNew").addEventListener("keydown", function(e){
   if(e.key === "Enter"){ e.preventDefault(); document.getElementById("fWorkAdd").click(); }
 });
 
-/* みんなの聖地の内容を編集（登録者・管理者のみ） */
+/* 聖地の内容を編集（登録者・管理者のみ） */
 var editingShared = null;
+var editingLog = null;      // 自分の記録を編集している聖地
 function openSharedEdit(s){
-  editingShared = s;
+  editingShared = s; editingLog = null;
   editingId = null;
-  draft = { lat:s.lat, lng:s.lng, photos:[], visits:[], addrAuto:false, visited:false };
+  draft = { lat:s.lat, lng:s.lng, photos:[], visits:[], addrAuto:false };
   draft.works = worksOf(s).slice();
   fName.value = s.name || "";
   fAddr.value = s.addr || ""; fMemo.value = s.memo || "";
   renderWorksPicker();
-  document.getElementById("fDestField").style.display = "none";
-  setDest("shared");
-  document.getElementById("fAuthorField").style.display = "none";
-  document.getElementById("fPhotoField").style.display = "none";   // 写真は詳細画面から追加する
+  // 写真は詳細画面から追加するので、ここには出さない
+  showFields(["fNameField","fWorksField","fAddrField","fMemoField","fCoordField"]);
+  document.getElementById("fMemoLabel").textContent = "メモ（どのシーンの場所か）";
+  fMemo.placeholder = "どの作品のどんなシーンに出てくるかを書くと親切です";
   document.getElementById("fPick").style.display = "none";
-  document.getElementById("fTitle").textContent = "みんなの聖地を編集";
+  document.getElementById("fTitle").textContent = "聖地を編集";
   document.getElementById("fCoord").textContent =
     s.lat.toFixed(5) + ", " + s.lng.toFixed(5) + "（位置は「位置を微調整」から変更できます）";
   renderFormPhotos();
@@ -2815,40 +2685,49 @@ function openSharedEdit(s){
   chrome();
 }
 
+/* 自分の記録（訪問日・自分だけのメモと写真）を編集する */
+function openLogForm(s){
+  editingShared = null; editingId = null; editingLog = s;
+  var r = ensureLog(s.id);
+  draft = { lat:s.lat, lng:s.lng, photos:r.photos.slice(), visits:r.visits.slice(),
+            works:[], addrAuto:false };
+  showFields(["fVisitsField","fMemoField","fPhotoField"]);
+  document.getElementById("fPick").style.display = "none";
+  document.getElementById("fTitle").textContent = "自分の記録";
+  document.getElementById("fVisitsLabel").textContent = "「" + s.name + "」の訪問日";
+  document.getElementById("fVisitsField").style.display = "block";
+  document.getElementById("fMemoLabel").textContent = "自分だけのメモ";
+  fMemo.value = r.memo || "";
+  fMemo.placeholder = "他の人には見えません。行ってみた感想など";
+  document.getElementById("fPhotoLabel").textContent =
+    "自分だけの写真（" + PERSONAL_PHOTO_MAX + "枚まで・この端末だけ）";
+  renderVisits();
+  renderFormPhotos();
+  formPage.style.display = "flex";
+  chrome();
+}
+
 function openForm(id, lat, lng){
-  editingShared = null;
+  editingShared = null; editingLog = null;
   document.getElementById("fPick").style.display = "block";
-  editingId = id || null;
-  if(id){
-    var s = personal.filter(function(x){ return x.id===id; })[0];
-    if(!s) return;
-    migrateVisits(s);
-    draft = { lat:s.lat, lng:s.lng, photos:(s.photos||[]).slice(),
-              visits:s.visits.slice(), works:worksOf(s).slice(), addrAuto:!s.addr };
-    fName.value = s.name || ""; fAddr.value = s.addr || "";
-    fMemo.value = s.memo || "";
-    renderWorksPicker();
-    setVisited(s.visits.length > 0);
-    document.getElementById("fDestField").style.display = "none";
-    setDest("personal");
-    document.getElementById("fTitle").textContent = "記録を編集";
-    if(!s.addr) fillAddress();
-  }else{
-    draft = { lat:lat, lng:lng, photos:[], visits:[], works:[], addrAuto:true };
-    fName.value = ""; fMemo.value = ""; fAddr.value = "";
-    renderWorksPicker();
-    fAuthor.value = nickname;
-    setVisited(true);
-    document.getElementById("fDestField").style.display = hasServer() ? "block" : "none";
-    setDest(hasServer() ? MODE : "personal");
-    document.getElementById("fTitle").textContent = "聖地を登録";
-    fillAddress();
-  }
+  editingId = null;
+  draft = { lat:lat, lng:lng, photos:[], visits:[], works:[], addrAuto:true };
+  fName.value = ""; fMemo.value = ""; fAddr.value = "";
+  renderWorksPicker();
+  fAuthor.value = nickname;
+  showFields(["fNameField","fWorksField","fAddrField","fMemoField",
+              "fAuthorField","fPhotoField","fCoordField"]);
+  document.getElementById("fMemoLabel").textContent = "メモ（どのシーンの場所か）";
+  fMemo.placeholder = "どの作品のどんなシーンに出てくるかを書くと親切です";
+  document.getElementById("fPhotoLabel").textContent =
+    "写真（" + SHARED_PHOTO_MAX + "枚まで・全員に公開されます）";
+  document.getElementById("fTitle").textContent = "聖地を登録";
+  fillAddress();
   document.getElementById("fCoord").textContent = draft.lat.toFixed(5)+", "+draft.lng.toFixed(5);
   renderFormPhotos();
   formPage.style.display = "flex";
   chrome();
-  setTimeout(function(){ if(!id) fName.focus(); }, 200);
+  setTimeout(function(){ fName.focus(); }, 200);
 }
 function fillAddress(){
   if(!draft || draft.addrAuto === false) return;
@@ -2861,15 +2740,6 @@ function fillAddress(){
   });
 }
 fAddr.addEventListener("input", function(){ if(draft) draft.addrAuto = false; });
-function setVisited(v){
-  if(!draft) return;
-  draft.visited = v;
-  if(v && !draft.visits.length) draft.visits = [today()];
-  if(!v) draft.visits = [];
-  fSw.classList.toggle("on", v);
-  document.getElementById("fVisitsField").style.display = (v && dest !== "shared") ? "block" : "none";
-  renderVisits();
-}
 function renderVisits(){
   var el = document.getElementById("fVisits");
   if(!el || !draft) return;
@@ -2884,7 +2754,6 @@ function renderVisits(){
   Array.prototype.forEach.call(el.querySelectorAll("button[data-del]"), function(b){
     b.onclick = function(){
       draft.visits.splice(+b.dataset.del, 1);
-      if(!draft.visits.length){ setVisited(false); return; }
       renderVisits();
     };
   });
@@ -2896,10 +2765,10 @@ document.getElementById("fAddVisit").addEventListener("click", function(){
   renderVisits();
   if(dup) toast("同じ日付があります。日付を変更してください");
 });
-document.getElementById("fVisitToggle").addEventListener("click", function(){ setVisited(!draft.visited); });
 document.getElementById("fCancel").addEventListener("click", function(){
   formPage.style.display = "none";
-  draft = null; editingId = null; editingShared = null;
+  draft = null; editingId = null; editingShared = null; editingLog = null;
+  pendingOrphan = null;
   document.getElementById("fPick").style.display = "block";
   chrome();
 });
@@ -2908,10 +2777,32 @@ document.getElementById("fPick").addEventListener("click", function(){
 });
 
 document.getElementById("fSave").addEventListener("click", function(){
+  // 自分の記録（訪問日・自分だけのメモと写真）を保存
+  if(editingLog){
+    var sp = editingLog;
+    var r = ensureLog(sp.id);
+    var wasVisited = r.visits.length > 0;
+    r.visits = uniqSorted(draft.visits);
+    r.memo   = fMemo.value.trim().slice(0, 1000);
+    r.photos = draft.photos.slice(0, PERSONAL_PHOTO_MAX);
+    var nowVisited = r.visits.length > 0;
+    pruneLog(sp.id);
+    if(!saveLog()) return;
+    if(wasVisited !== nowVisited) sbSetAdded(sp.id, nowVisited, function(){ renderList(); });
+    formPage.style.display = "none";
+    draft = null; editingLog = null;
+    document.getElementById("fPick").style.display = "block";
+    chrome();
+    renderMarkers(); renderList();
+    toast("自分の記録を保存しました");
+    setTimeout(function(){ openSheet(sp.id); }, 200);
+    return;
+  }
+
   var name = fName.value.trim();
   if(!name){ toast("場所の名前を入力してください"); fName.focus(); return; }
 
-  // みんなの聖地の内容を更新
+  // 聖地の内容を更新
   if(editingShared){
     var target = editingShared;
     var btn = document.getElementById("fSave");
@@ -2937,18 +2828,19 @@ document.getElementById("fSave").addEventListener("click", function(){
     return;
   }
 
-  if(dest === "shared" && !editingId){
-    if(!hasServer()){ toast("オンラインにつながっていません"); return; }
-    var nick = (fAuthor.value || "").trim() || nickname || "名無し";
-    nickname = nick.slice(0,40);
-    localStorage.setItem(KEY_NICK, nickname);
-    updateProfileUI();
-    var token = randToken();
-    var lat = draft.lat, lng = draft.lng;
-    var pics = draft.photos.slice(0, SHARED_PHOTO_MAX);
-    var saveBtn = document.getElementById("fSave");
-    saveBtn.textContent = pics.length ? "写真を送信中…" : "保存中…";
-    sbUploadAll(pics, function(urls){
+  // 新しい聖地を登録
+  if(!hasServer()){ toast("オンラインにつながっていません"); return; }
+  var nick = (fAuthor.value || "").trim() || nickname || "名無し";
+  nickname = nick.slice(0,40);
+  localStorage.setItem(KEY_NICK, nickname);
+  updateProfileUI();
+  var token = randToken();
+  var lat = draft.lat, lng = draft.lng;
+  var pics = draft.photos.slice(0, SHARED_PHOTO_MAX);
+  var orphan = pendingOrphan;
+  var saveBtn = document.getElementById("fSave");
+  saveBtn.textContent = pics.length ? "写真を送信中…" : "保存中…";
+  sbUploadAll(pics, function(urls){
     if(pics.length && !urls.length){
       saveBtn.textContent = "保存";
       toast(lastUploadError || "写真をアップロードできませんでした");
@@ -2964,28 +2856,33 @@ document.getElementById("fSave").addEventListener("click", function(){
       saveBtn.textContent = "保存";
       if(!ok){ toast("登録できませんでした。通信状況をご確認ください"); return; }
       formPage.style.display = "none";
-      draft = null; editingId = null;
+      draft = null; editingId = null; pendingOrphan = null;
       chrome();
-      var w0 = wks.slice(), a0 = fAddr.value.trim(), m0 = fMemo.value.trim();
-      toast("みんなの聖地に登録しました");
-      setMode("shared", true);
+      toast("聖地に登録しました");
       sbLoad(function(){
         var mine = shared.filter(function(x){
           return x.name === name && Math.abs(x.lat - lat) < 1e-6;
         })[0];
         if(mine){
           myTokens[mine.id] = token; saveTokens();
-          // 登録した本人の記録にも自動で追加する
-          if(!alreadyCopied(mine.id)){
-            personal.push({
-              id: uid(), created: Date.now(), fromShared: mine.id,
-              name: name, works: w0, work: (w0[0]||""), addr: a0, memo: m0,
-              visits: [today()], visited: true, date: today(),
-              lat: lat, lng: lng, photos: (urls || []).slice(0, PERSONAL_PHOTO_MAX)
+          var r = ensureLog(mine.id);
+          if(orphan){
+            // 引き継げなかった記録の中身をこの聖地に移す
+            oldVisits(orphan).forEach(function(d){ if(r.visits.indexOf(d) < 0) r.visits.push(d); });
+            r.visits = uniqSorted(r.visits);
+            if(!r.visits.length) r.visits = [today()];
+            if(orphan.memo && !r.memo) r.memo = String(orphan.memo);
+            (orphan.photos || []).forEach(function(u){
+              if(/^data:/.test(u) && r.photos.length < PERSONAL_PHOTO_MAX && r.photos.indexOf(u) < 0) r.photos.push(u);
             });
-            saveLocal();
-            sbSetAdded(mine.id, true);
+            orphans = orphans.filter(function(o){ return o !== orphan; });
+            saveOrphans(); updateOrphanState();
+          }else if(!r.visits.length){
+            // 登録した本人は訪問済みとして記録する
+            r.visits = [today()];
           }
+          saveLog();
+          sbSetAdded(mine.id, true);
         }
         rememberMyPhotos(urls || []);
         renderMarkers(); renderList();
@@ -2993,35 +2890,10 @@ document.getElementById("fSave").addEventListener("click", function(){
         if(mine) setTimeout(function(){ openSheet(mine.id); }, 250);
       });
     });
-    });
-    return;
-  }
-
-  var visits = uniqSorted(draft.visits);
-  var data = {
-    name:name, works:(draft.works||[]).slice(0, WORKS_MAX), work:((draft.works||[])[0]||""),
-    addr:fAddr.value.trim(), memo:fMemo.value.trim(),
-    visits: visits, visited: visits.length > 0, date: visits[0] || "",
-    lat: draft.lat, lng: draft.lng, photos: draft.photos.slice()
-  };
-  if(editingId){
-    personal = personal.map(function(s){ return s.id===editingId ? Object.assign(s, data) : s; });
-  }else{
-    data.id = uid(); data.created = Date.now();
-    personal.push(data);
-  }
-  if(!saveLocal()) return;
-  var savedId = editingId || data.id;
-  formPage.style.display = "none";
-  draft = null; editingId = null;
-  chrome();
-  toast("保存しました");
-  setMode("personal", true);
-  showPage("mapPage");
-  setTimeout(function(){ openSheet(savedId); }, 250);
+  });
 });
 
-function photoMax(){ return dest === "shared" ? SHARED_PHOTO_MAX : PERSONAL_PHOTO_MAX; }
+function photoMax(){ return editingLog ? PERSONAL_PHOTO_MAX : SHARED_PHOTO_MAX; }
 function renderFormPhotos(){
   if(!draft) return;
   if(draft.photos.length > photoMax()) draft.photos = draft.photos.slice(0, photoMax());
@@ -3156,29 +3028,20 @@ Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(c){
 });
 function renderList(){
   var statsEl = document.getElementById("stats");
-  var arr;
 
   var base = baseList();      // 作品のしぼりこみ・コース表示を反映した一覧
+  var total = base.length;
+  var vis = base.filter(isVisited).length;
+  var rate = total ? Math.round(vis/total*100) : 0;
+  var newN = base.filter(isNew).length;
+  statsEl.innerHTML =
+    '<div class="stat"><b>'+vis+'</b><span>訪問済み</span></div>'
+  + '<div class="stat"><b>'+total+'</b><span>'+(workFilter ? 'この作品の聖地' : '聖地')+'</span></div>'
+  + '<div class="stat"><b>'+rate+'%</b><span>達成率</span></div>'
+  + (newN ? '<div class="stat"><b style="color:var(--red)">'+newN+'</b><span>前回から新着</span></div>' : '');
+  document.getElementById("stBar").style.width = rate + "%";
 
-  if(MODE === "shared"){
-    var copied = base.filter(function(s){ return alreadyCopied(s.id); }).length;
-    var newN = base.filter(isNew).length;
-    statsEl.innerHTML =
-      '<div class="stat"><b>'+base.length+'</b><span>'+(workFilter ? 'この作品の聖地' : 'みんなの聖地')+'</span></div>'
-    + '<div class="stat"><b>'+copied+'</b><span>自分に追加済み</span></div>'
-    + (newN ? '<div class="stat"><b style="color:var(--red)">'+newN+'</b><span>前回から新着</span></div>' : '');
-    arr = currentList().slice();
-  }else{
-    var total = base.length;
-    var vis = base.filter(function(s){ return s.visited; }).length;
-    var rate = total ? Math.round(vis/total*100) : 0;
-    statsEl.innerHTML =
-      '<div class="stat"><b>'+vis+'</b><span>訪問済み</span></div>'
-    + '<div class="stat"><b>'+total+'</b><span>'+(workFilter ? 'この作品の記録' : '記録した聖地')+'</span></div>'
-    + '<div class="stat"><b>'+rate+'%</b><span>達成率</span></div>';
-    document.getElementById("stBar").style.width = rate + "%";
-    arr = currentList().slice().sort(function(a,b){ return (b.created||0)-(a.created||0); });
-  }
+  var arr = currentList().slice();
 
   var nearMode = (sortMode === "near" && myPos && !courseView);
   if(nearMode){
@@ -3194,90 +3057,41 @@ function renderList(){
   }
   if(!arr.length){
     var msg;
-    if(MODE === "shared"){
-      msg = !hasServer()
-        ? 'オンラインにつながっていません'
-        : (workFilter ? 'この作品の聖地はまだありません'
-          : (sharedReady ? 'まだ誰も登録していません<br>「聖地を登録」から追加できます'
-                         : 'オンラインにつながりません<br>通信状況をご確認ください'));
+    if(!hasServer()){
+      msg = 'オンラインにつながっていません';
+    }else if(!sharedReady){
+      msg = 'オンラインにつながりません<br>通信状況をご確認ください';
+    }else if(filter !== "all" && total){
+      msg = (filter === "visited") ? 'まだ訪問済みの聖地がありません' : 'すべて訪問済みです';
+    }else if(workFilter){
+      msg = 'この作品の聖地はまだありません';
     }else{
-      msg = personal.length
-        ? 'この条件の聖地はありません'
-        : 'まだ記録がありません<br>「みんなの聖地」から追加するか<br>「聖地を登録」で自分だけの記録を作れます';
+      msg = 'まだ誰も登録していません<br>「聖地を登録」から追加できます';
     }
     cardsEl.innerHTML = '<div class="empty"><div class="big">🔍</div>'+msg+'</div>';
     return;
   }
 
-  var bulkHtml = "";
-  if(MODE === "shared"){
-    var todo = arr.filter(function(s){ return !alreadyCopied(s.id); });
-    if(todo.length > 1){
-      bulkHtml = '<button class="newbtn" id="bulkAdd">＋ 表示中の'+todo.length+'件を自分の記録に追加</button>';
-    }
-  }
-
   updateFilterBar();
-  cardsEl.innerHTML = bulkHtml + arr.map(function(s){
-    var th, badge, subHtml;
-    if(MODE === "shared"){
-      th = safePhotoUrl((s.photos||[])[0])
-        ? '<img class="thumb" loading="lazy" src="'+esc(safePhotoUrl(s.photos[0]))+'">'
-        : '<div class="thumb ph">📍</div>';
-      badge = alreadyCopied(s.id)
-        ? '<span class="b" style="background:#fdecef;color:#d7263d;">✓ 追加済み</span>'
-        : (s.author
-            ? '<span class="b" style="background:#eaeef6;color:#1b2a49;">'+esc(s.author)+'</span>'
-            : '');
-      if(s.add_count > 0){
-        badge += '<span class="b" style="background:#f3f0e8;color:#8a7a4a;margin-left:5px;">'+s.add_count+'人が追加</span>';
-      }
-      subHtml = worksOf(s).length ? workLabelHtml(s) : esc(s.addr || "作品未設定");
-    }else{
-      migrateVisits(s);
-      th = safePhotoUrl((s.photos||[])[0]) ? '<img class="thumb" loading="lazy" src="'+esc(safePhotoUrl(s.photos[0]))+'">' : '<div class="thumb ph">📍</div>';
-      badge = s.visited
-        ? '<span class="b" style="background:#fdecef;color:#d7263d;">✓ '+s.visits.length+'回訪問'+(s.date? ' ・初回 '+esc(fmtDate(s.date)) : '')+'</span>'
-        : '<span class="b" style="background:#f1f1f4;color:#8a8a95;">未訪問</span>';
-      subHtml = worksOf(s).length ? workLabelHtml(s) : esc(s.addr || "作品未設定");
+  cardsEl.innerHTML = arr.map(function(s){
+    var th = safePhotoUrl((s.photos||[])[0])
+      ? '<img class="thumb" loading="lazy" src="'+esc(safePhotoUrl(s.photos[0]))+'">'
+      : '<div class="thumb ph">📍</div>';
+    var v = visitsOf(s);
+    var badge = v.length
+      ? '<span class="b" style="background:#fdecef;color:#d7263d;">✓ '+v.length+'回訪問'+(v[0] ? ' ・初回 '+esc(fmtDate(v[0])) : '')+'</span>'
+      : (s.author ? '<span class="b" style="background:#eaeef6;color:#1b2a49;">'+esc(s.author)+'</span>' : '');
+    if(s.add_count > 0){
+      badge += '<span class="b" style="background:#f3f0e8;color:#8a7a4a;margin-left:5px;">'+s.add_count+'人が訪問</span>';
     }
+    var subHtml = worksOf(s).length ? workLabelHtml(s) : esc(s.addr || "作品未設定");
     var dist = nearMode ? '<div class="dist">'+esc(fmtDist(distM(myPos, s)))+'</div>' : '';
-    var nb = (MODE === "shared") ? newBadge(s) : "";
     return '<div class="card" data-id="'+esc(s.id)+'">'+th
-      + '<div class="info"><h4>'+nb+esc(s.name)+'</h4><p>'+subHtml+'</p>'+badge+'</div>'+dist+'</div>';
+      + '<div class="info"><h4>'+newBadge(s)+esc(s.name)+'</h4><p>'+subHtml+'</p>'+badge+'</div>'+dist+'</div>';
   }).join("");
-}
-/* みんなの聖地を、表示中のぶんだけまとめて自分の記録へ */
-function bulkAddToPersonal(list){
-  var added = 0;
-  list.forEach(function(s){
-    if(alreadyCopied(s.id)) return;
-    personal.push({
-      id: uid(), created: Date.now() + added, fromShared: s.id,
-      name: s.name, works: worksOf(s).slice(), work: (worksOf(s)[0] || ""),
-      addr: s.addr || "", memo: s.memo || "",
-      visited: false, date: "", visits: [],
-      lat: s.lat, lng: s.lng, photos: []
-    });
-    added++;
-  });
-  if(!added){ toast("追加できるものがありませんでした"); return; }
-  if(!saveLocal()) return;
-  renderMarkers(); renderList();
-  toast(added + "件を自分の記録に追加しました");
-  list.forEach(function(s){ sbSetAdded(s.id, true); });
-  setTimeout(renderList, 1200);
 }
 
 cardsEl.addEventListener("click", function(e){
-  var bulk = e.target.closest("#bulkAdd");
-  if(bulk){
-    var list = currentList().filter(function(s){ return !alreadyCopied(s.id); });
-    if(!list.length){ toast("すべて追加済みです"); return; }
-    if(!confirm("表示中の" + list.length + "件を、自分の記録に追加します。\n未訪問として入るので、行った場所は個別に訪問済みにしてください。")) return;
-    bulkAddToPersonal(list);
-    return;
-  }
   var c = e.target.closest(".card");
   if(!c) return;
   showPage("mapPage");
@@ -3363,7 +3177,11 @@ function openCourse(c){
   var missing = (c.spot_ids||[]).filter(function(id){ return !spotById(id); }).length;
   courseView = c;
   workFilter = null; updateWorkBtn();
-  setMode("shared", true);
+  filter = "all";
+  Array.prototype.forEach.call(document.querySelectorAll("#filters .chip"), function(x){
+    x.classList.toggle("on", x.dataset.f === "all");
+  });
+  closeSheet();
   showPage("mapPage");
   courseBar.style.display = "block";
   document.getElementById("courseBarTitle").textContent = c.title;
@@ -3513,7 +3331,7 @@ function openCourseForm(){
 }
 document.getElementById("btnNewCourse").addEventListener("click", function(){
   if(!hasServer()){ toast("オンラインにつながっていません"); return; }
-  if(shared.length < 2){ toast("みんなの聖地が2か所以上必要です"); return; }
+  if(shared.length < 2){ toast("聖地が2か所以上必要です"); return; }
   editingCourse = null;
   draftSteps = []; draftLegT = []; draftLegM = []; draftStay = [];
   document.getElementById("cTitle").value = "";
@@ -3896,7 +3714,7 @@ document.getElementById("btnMergeWork").addEventListener("click", function(){
   });
 });
 
-/* ---------------- 管理者用：みんなの聖地の丸ごと保存と復元 ---------------- */
+/* ---------------- 管理者用：聖地の丸ごと保存と復元 ---------------- */
 function sbAll(table, cols, cb){
   fetch(sbBase() + "/rest/v1/" + table + "?select=" + cols + "&limit=5000", { headers: sbHeaders() })
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -3996,7 +3814,8 @@ document.getElementById("btnReload").addEventListener("click", function(){
   });
 });
 document.getElementById("btnExport").addEventListener("click", function(){
-  var blob = new Blob([JSON.stringify(personal, null, 2)], { type:"application/json" });
+  var data = { app:"seichi", v:2, saved: new Date().toISOString(), log: myLog, orphans: orphans };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "seichi-backup-" + new Date().toISOString().slice(0,10) + ".json";
@@ -4011,16 +3830,34 @@ document.getElementById("importInput").addEventListener("change", function(e){
   var r = new FileReader();
   r.onload = function(){
     try{
-      var arr = JSON.parse(r.result);
-      if(!Array.isArray(arr)) throw 0;
-      var have = {}; personal.forEach(function(s){ have[s.id]=1; });
+      var data = JSON.parse(r.result);
       var n = 0;
-      arr.forEach(function(s){
-        if(!s || typeof s.lat!=="number" || typeof s.lng!=="number") return;
-        if(!s.id || have[s.id]) s.id = uid();
-        personal.push(migrateVisits(s)); n++;
-      });
-      saveLocal(); setMode("personal", true); renderMarkers(); renderList(); fitAll();
+      if(Array.isArray(data)){
+        // 昔のバックアップ（自分の記録の一覧）
+        data.forEach(function(pRec){
+          if(!pRec) return;
+          if(pRec.fromShared){
+            mergeIntoLog(pRec.fromShared, pRec); n++;
+          }else if(typeof pRec.lat === "number" && typeof pRec.lng === "number"){
+            orphans.push(pRec); n++;
+          }
+        });
+      }else if(data && typeof data === "object" && data.log){
+        Object.keys(data.log).forEach(function(k){
+          var src = normLog(data.log[k]);
+          var dst = ensureLog(k);
+          src.visits.forEach(function(d){ if(dst.visits.indexOf(d) < 0) dst.visits.push(d); });
+          dst.visits = uniqSorted(dst.visits);
+          if(src.memo && !dst.memo) dst.memo = src.memo;
+          src.photos.forEach(function(u){
+            if(dst.photos.length < PERSONAL_PHOTO_MAX && dst.photos.indexOf(u) < 0) dst.photos.push(u);
+          });
+          pruneLog(k); n++;
+        });
+        if(Array.isArray(data.orphans)) data.orphans.forEach(function(o){ orphans.push(o); n++; });
+      }else{ throw 0; }
+      saveLog(); saveOrphans(); updateOrphanState();
+      renderMarkers(); renderList();
       toast(n + "件を読み込みました");
     }catch(err){ toast("そのファイルは読み込めませんでした"); }
   };
@@ -4028,20 +3865,115 @@ document.getElementById("importInput").addEventListener("change", function(e){
   e.target.value = "";
 });
 document.getElementById("btnReset").addEventListener("click", function(){
-  if(!confirm("このスマホに保存した記録をすべて消します。よろしいですか？")) return;
+  if(!confirm("このスマホに保存した訪問記録・自分だけのメモと写真をすべて消します。よろしいですか？")) return;
   if(!confirm("本当に消しますか？元には戻せません。")) return;
-  personal = []; saveLocal(); renderMarkers(); renderList(); toast("削除しました");
+  myLog = {}; orphans = [];
+  saveLog(); saveOrphans(); updateOrphanState();
+  renderMarkers(); renderList(); toast("削除しました");
 });
 
-/* 以前に追加したぶんを、一度だけサーバーへ知らせる */
-var KEY_ADDSYNC = "conan-seichi-addsync";
-function syncAddedOnce(){
+/* ---------------- 昔の「自分の記録」からの引き継ぎ ---------------- */
+function mergeIntoLog(spotId, pRec){
+  var r = ensureLog(spotId);
+  oldVisits(pRec).forEach(function(d){ if(r.visits.indexOf(d) < 0) r.visits.push(d); });
+  r.visits = uniqSorted(r.visits);
+  if(pRec.memo && !r.memo) r.memo = String(pRec.memo).slice(0, 1000);
+  // サーバー上の写真はもともと聖地側に出るので、端末の中だけにある写真だけ引き継ぐ
+  (pRec.photos || []).forEach(function(u){
+    if(/^data:/.test(u) && r.photos.length < PERSONAL_PHOTO_MAX && r.photos.indexOf(u) < 0) r.photos.push(u);
+  });
+  pruneLog(spotId);
+}
+function migrateFromPersonal(){
+  if(localStorage.getItem(KEY_MIGRATED) === "1") return;
+  var old = [];
+  try{ old = JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]"); }catch(e){ old = []; }
+  if(!Array.isArray(old)) old = [];
+  var orph = [];
+  old.forEach(function(pRec){
+    if(!pRec) return;
+    if(pRec.fromShared){
+      mergeIntoLog(pRec.fromShared, pRec);
+    }else if(typeof pRec.lat === "number" && typeof pRec.lng === "number"){
+      orph.push(pRec);
+    }
+  });
+  orphans = orphans.concat(orph);
+  saveLog(); saveOrphans();
+  // 元のデータは消さずに残しておく（うまくいかなかったときに戻せるように）
+  try{ localStorage.setItem(KEY_MIGRATED, "1"); }catch(e){}
+}
+
+/* ---------------- 引き継げなかった記録 ---------------- */
+var pendingOrphan = null;
+function updateOrphanState(){
+  var item = document.getElementById("btnOrphans");
+  if(!item) return;
+  item.style.display = orphans.length ? "flex" : "none";
+  var st = document.getElementById("orphanState");
+  if(st) st.textContent = orphans.length + "件。聖地として登録するか、消すかを選べます";
+}
+function openOrphans(){
+  if(!orphans.length){ toast("引き継げなかった記録はありません"); return; }
+  var h = '<div class="sheet-pad">'
+        + '<div class="sheet-title"><h2>引き継げなかった記録</h2>'
+        + '<button class="closeX" id="sClose">×</button></div>'
+        + '<p class="myempty" style="margin-top:10px;">聖地とひもづいていない、この端末だけの記録です。'
+        + 'みんなの一覧に「聖地として登録」するか、いらなければ消してください。</p></div>'
+        + '<div style="padding:0 18px 18px;">';
+  orphans.forEach(function(o, i){
+    var sub = (Array.isArray(o.works) ? o.works.join("／") : (o.work || "")) || o.addr || "";
+    var v = oldVisits(o);
+    h += '<div class="orphan-row"><div class="oi"><b>'+esc(o.name || "名前なし")+'</b>'
+       + '<span>'+esc(sub)+(v.length ? '　'+v.length+'回訪問' : '')+'</span></div>'
+       + '<button class="reg" data-oreg="'+i+'">登録</button>'
+       + '<button data-odel="'+i+'">消す</button></div>';
+  });
+  h += '</div>';
+  sheetBody.innerHTML = h;
+  sheetBody.scrollTop = 0;
+  sheet.style.transition = ""; sheet.style.transform = "";
+  sheet.style.display = "flex";
+  sheetMask.style.display = "block"; sheetMask.style.opacity = "";
+  document.getElementById("sClose").onclick = closeSheet;
+  Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-oreg]"), function(b){
+    b.onclick = function(){
+      if(!hasServer()){ toast("オンラインにつながっていません"); return; }
+      closeSheet();
+      openOrphanRegister(orphans[+b.dataset.oreg]);
+    };
+  });
+  Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-odel]"), function(b){
+    b.onclick = function(){
+      var o = orphans[+b.dataset.odel];
+      if(!o || !confirm("「"+(o.name || "名前なし")+"」の記録を消しますか？元には戻せません")) return;
+      orphans = orphans.filter(function(x){ return x !== o; });
+      saveOrphans(); updateOrphanState();
+      if(orphans.length) openOrphans(); else { closeSheet(); toast("すべて片づきました"); }
+    };
+  });
+}
+function openOrphanRegister(o){
+  if(!o) return;
+  openForm(null, o.lat, o.lng);
+  pendingOrphan = o;
+  fName.value = o.name || "";
+  fAddr.value = o.addr || "";
+  fMemo.value = o.memo || "";
+  draft.addrAuto = false;
+  draft.works = (Array.isArray(o.works) ? o.works.slice() : (o.work ? [o.work] : [])).slice(0, WORKS_MAX);
+  draft.photos = (o.photos || []).filter(function(u){ return /^data:/.test(u); }).slice(0, SHARED_PHOTO_MAX);
+  renderWorksPicker();
+  renderFormPhotos();
+}
+document.getElementById("btnOrphans").addEventListener("click", openOrphans);
+
+/* 訪問済みの聖地を、一度だけサーバーへ知らせる（人数の集計用） */
+function syncVisitsOnce(){
   if(!hasServer()) return;
-  if(localStorage.getItem(KEY_ADDSYNC) === "1") return;
-  var ids = {};
-  personal.forEach(function(p){ if(p.fromShared) ids[p.fromShared] = 1; });
-  var list = Object.keys(ids);
-  try{ localStorage.setItem(KEY_ADDSYNC, "1"); }catch(e){}
+  if(localStorage.getItem(KEY_VISITSYNC) === "1") return;
+  var list = Object.keys(myLog).filter(function(k){ return myLog[k].visits.length > 0; });
+  try{ localStorage.setItem(KEY_VISITSYNC, "1"); }catch(e){}
   if(!list.length) return;
   var i = 0;
   (function next(){
@@ -4052,6 +3984,8 @@ function syncAddedOnce(){
 
 /* ================= 起動 ================= */
 loadLocal();
+migrateFromPersonal();
+updateOrphanState();
 if(sortMode === "near") sortMode = "new";   // 起動直後は現在地がないので通常の並びから
 renderSortRow();
 document.getElementById("verLabel").textContent = APP_VERSION;
@@ -4059,8 +3993,9 @@ updateProfileUI();
 updateAdminState();
 renderStyleSheet();
 initMap();
-if(!hasServer() && MODE === "shared") MODE = "personal";
-setMode(MODE, true);
+renderMarkers();
+renderList();
+updateFilterBar();
 updateServerState();
 if(hasServer()){
   sbTouchVisitor();
@@ -4068,7 +4003,10 @@ if(hasServer()){
   sbLoadCourses(renderCourseList);
   sbLoad(function(){
     renderMarkers(); renderList(); renderCourseList(); updateWorkBtn();
-    syncAddedOnce();
+    syncVisitsOnce();
+    if(orphans.length){
+      toast("引き継げなかった記録が" + orphans.length + "件あります。設定から確認してください");
+    }
   });
 }
 
