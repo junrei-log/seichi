@@ -12,17 +12,72 @@
 <title>聖地巡礼マップ</title>
 <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet">
 <link href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet">
+<script>
+/* 画面が出る前に配色を決める（切り替わるときの白いちらつきを防ぐ） */
+(function(){
+  try{
+    var t = localStorage.getItem("conan-seichi-theme") || "auto";
+    var dark = t === "dark" || (t === "auto" && window.matchMedia
+      && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    var m = document.querySelector('meta[name="theme-color"]');
+    if(m) m.setAttribute("content", dark ? "#15171d" : "#1b2a49");
+  }catch(e){}
+})();
+</script>
 <style>
   :root{
+    color-scheme:light;
     --navy:#1b2a49;
     --red:#d7263d;
-    --bg:#ffffff;
+    --bg:#ffffff;        /* 画面の地の色 */
+    --card:#ffffff;      /* 浮いている面（カード・シート・検索欄） */
+    --soft:#fafafb;      /* うっすらした面（リストの見出し・入力欄） */
+    --fill:#f1f1f4;      /* ボタンやチップの塗り */
+    --track:#eceff2;     /* バーの下地・画像の待ち色 */
+    --dotoff:#d5d5db;
     --line:#e8e8ec;
+    --line2:#cccccc;
     --text:#1a1a1e;
+    --text2:#4a4a52;
     --sub:#7a7a85;
+    --faint:#c9c9d1;
+    --tint:#eaeef6;      /* 紺系の淡い背景 */
+    --tintText:#1b2a49;
+    --redTint:#fdecef;
+    --goldTint:#f3f0e8;
+    --goldText:#8a7a4a;
+    --danger:#c0392b;
+    --sh:rgba(0,0,0,.16);
+    --sh2:rgba(0,0,0,.22);
     --safe-b: env(safe-area-inset-bottom, 0px);
     --safe-t: env(safe-area-inset-top, 0px);
     --nav-h: 58px;
+  }
+  html[data-theme="dark"]{
+    color-scheme:dark;
+    --navy:#3f5da3;
+    --red:#ff4d63;
+    --bg:#15171d;
+    --card:#21242c;
+    --soft:#1b1e25;
+    --fill:#2b2f39;
+    --track:#2b2f39;
+    --dotoff:#4a4f5c;
+    --line:#2f3440;
+    --line2:#454b58;
+    --text:#e9ebf0;
+    --text2:#c3c7d0;
+    --sub:#9096a4;
+    --faint:#5a5f6d;
+    --tint:rgba(120,150,220,.20);
+    --tintText:#a9bff0;
+    --redTint:rgba(255,90,110,.18);
+    --goldTint:rgba(220,190,120,.16);
+    --goldText:#cbb679;
+    --danger:#ff6b5a;
+    --sh:rgba(0,0,0,.5);
+    --sh2:rgba(0,0,0,.6);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;margin:0;}
@@ -40,7 +95,7 @@
   .page.active{display:block;}
 
   /* ---------- 地図 ---------- */
-  #map{position:absolute;inset:0;background:#eef1f3;}
+  #map{position:absolute;inset:0;background:var(--track);}
   .maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right{font-size:10px;}
   .maplibregl-ctrl-attrib.maplibregl-compact{margin:0 6px 6px 0;}
 
@@ -49,29 +104,29 @@
     display:flex;gap:8px;align-items:flex-start;
   }
   #searchBox{
-    flex:1;display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;
-    padding:11px 16px;box-shadow:0 3px 14px rgba(0,0,0,.16);
+    flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border-radius:999px;
+    padding:11px 16px;box-shadow:0 3px 14px var(--sh);
   }
   #searchBox input{border:none;outline:none;flex:1;background:none;font-size:15px;min-width:0;}
   #searchBox svg{flex:none;opacity:.5;}
   #addBtn{
     flex:none;background:var(--red);color:#fff;border-radius:999px;padding:12px 16px;
-    font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 3px 14px rgba(0,0,0,.2);
+    font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 3px 14px var(--sh);
   }
   #suggest{
-    position:absolute;top:52px;left:0;right:0;background:#fff;border-radius:14px;
-    box-shadow:0 6px 22px rgba(0,0,0,.18);overflow:hidden;max-height:46vh;overflow-y:auto;display:none;
+    position:absolute;top:52px;left:0;right:0;background:var(--card);border-radius:14px;
+    box-shadow:0 6px 22px var(--sh);overflow:hidden;max-height:46vh;overflow-y:auto;display:none;
   }
   #suggest .s-item{padding:12px 16px;border-bottom:1px solid var(--line);}
   #suggest .s-item:last-child{border-bottom:none;}
   #suggest .s-item b{display:block;font-size:14px;}
   #suggest .s-item span{font-size:12px;color:var(--sub);}
-  #suggest .s-head{padding:8px 16px;font-size:11px;font-weight:700;color:var(--sub);background:#f7f7f9;}
+  #suggest .s-head{padding:8px 16px;font-size:11px;font-weight:700;color:var(--sub);background:var(--fill);}
 
   #filterBar{
     position:absolute;top:calc(66px + var(--safe-t));left:50%;transform:translateX(-50%);z-index:5;
     display:flex;align-items:center;gap:2px;background:var(--navy);color:#fff;border-radius:999px;
-    padding:4px;box-shadow:0 3px 14px rgba(0,0,0,.22);max-width:calc(100% - 24px);
+    padding:4px;box-shadow:0 3px 14px var(--sh);max-width:calc(100% - 24px);
   }
   .fbitem{
     color:#fff;padding:6px 2px 6px 8px;font-size:13px;font-weight:700;
@@ -86,8 +141,9 @@
   .fbn{font-weight:400;opacity:.75;margin-left:6px;font-size:.9em;}
 
   .fab{
-    position:absolute;right:12px;z-index:5;width:44px;height:44px;border-radius:12px;background:#fff;
-    box-shadow:0 2px 10px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;
+    position:absolute;right:12px;z-index:5;width:44px;height:44px;border-radius:12px;
+    background:var(--card);color:var(--text);
+    box-shadow:0 2px 10px var(--sh);display:flex;align-items:center;justify-content:center;
   }
   #locBtn{bottom:26px;}
   #styleBtn{bottom:78px;font-size:18px;}
@@ -97,12 +153,12 @@
   /* 作品で絞り込み */
   #workSheet{
     position:absolute;left:12px;right:12px;bottom:16px;z-index:9;display:none;
-    background:#fff;border-radius:16px;padding:8px;box-shadow:0 6px 26px rgba(0,0,0,.25);
+    background:var(--card);border-radius:16px;padding:8px;box-shadow:0 6px 26px var(--sh);
     max-height:60vh;overflow-y:auto;
   }
   #workSheet button{display:flex;width:100%;justify-content:space-between;gap:10px;
     text-align:left;padding:12px 14px;border-radius:10px;font-size:15px;}
-  #workSheet button.on{background:#f6f6f8;font-weight:700;color:var(--red);}
+  #workSheet button.on{background:var(--fill);font-weight:700;color:var(--red);}
   #workSheet button i{font-style:normal;color:var(--sub);font-size:12px;font-weight:400;}
 
   /* コース */
@@ -110,17 +166,17 @@
   .num-pin{
     min-width:30px;height:30px;padding:0 7px;border-radius:999px;background:var(--red);color:#fff;
     display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;
-    border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.35);cursor:pointer;
+    border:2.5px solid #fff;box-shadow:0 2px 5px var(--sh2);cursor:pointer;
   }
-  #coursePage{overflow-y:auto;background:#f7f7f9;}
-  .course-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  #coursePage{overflow-y:auto;background:var(--fill);}
+  .course-card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px var(--sh);}
   .course-card h4{margin:0;font-size:16px;font-weight:800;}
   .course-card .cmeta{font-size:12px;color:var(--sub);margin-top:4px;display:flex;align-items:center;gap:6px;}
   .course-card .cmeta .avatar,.course-card .cmeta .avatar-ph{width:20px;height:20px;font-size:10px;}
-  .course-card p{margin:8px 0 0;font-size:13px;color:#44444c;
+  .course-card p{margin:8px 0 0;font-size:13px;color:var(--text2);
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .course-card .chips{display:flex;gap:6px;margin-top:10px;overflow-x:auto;}
-  .course-card .chips span{flex:none;font-size:11px;background:#f1f1f4;color:#555;border-radius:999px;padding:4px 10px;white-space:nowrap;}
+  .course-card .chips span{flex:none;font-size:11px;background:var(--fill);color:var(--text2);border-radius:999px;padding:4px 10px;white-space:nowrap;}
   .newbtn{
     width:100%;background:var(--navy);color:#fff;border-radius:14px;padding:14px;
     font-size:15px;font-weight:700;margin-bottom:12px;
@@ -136,18 +192,18 @@
   .step .sname span{font-size:11px;color:var(--sub);}
   .stayin{
     margin-top:6px;width:100%;border:1px solid var(--line);border-radius:8px;
-    padding:7px 9px;background:#fafafb;font-size:13px;outline:none;
+    padding:7px 9px;background:var(--soft);font-size:13px;outline:none;
   }
   .step .ops{display:flex;gap:4px;flex:none;}
-  .step .ops button{width:30px;height:30px;border-radius:8px;background:#f1f1f4;color:#666;font-size:13px;}
+  .step .ops button{width:30px;height:30px;border-radius:8px;background:var(--fill);color:var(--sub);font-size:13px;}
   .pickrow{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
   .pickrow .sname{flex:1;min-width:0;}
   .pickrow button{flex:none;background:var(--navy);color:#fff;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;}
-  .pickrow button.added{background:#eceef3;color:#8a8a95;}
+  .pickrow button.added{background:var(--soft);color:var(--sub);}
   /* 作品名の選択 */
   .worksel{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
   .worksel span{
-    display:inline-flex;align-items:center;gap:6px;background:#eaeef6;color:var(--navy);
+    display:inline-flex;align-items:center;gap:6px;background:var(--tint);color:var(--navy);
     border-radius:999px;padding:8px 8px 8px 13px;font-size:14px;font-weight:700;
   }
   .worksel span button{
@@ -162,7 +218,7 @@
   .catrow{display:flex;flex-wrap:wrap;gap:8px;}
   .catrow button{
     padding:12px 17px;border-radius:12px;border:1.5px solid var(--line);
-    background:#fafafb;font-size:15px;font-weight:700;color:#666;
+    background:var(--soft);font-size:15px;font-weight:700;color:var(--sub);
   }
   .catrow button.on{
     background:var(--navy);border-color:var(--navy);color:#fff;
@@ -171,9 +227,9 @@
   .worklist{display:flex;flex-wrap:wrap;gap:7px;max-height:32vh;overflow-y:auto;}
   .worklist button{
     padding:8px 13px;border-radius:999px;border:1px solid var(--line);
-    background:#fafafb;font-size:13px;color:#555;
+    background:var(--soft);font-size:13px;color:var(--text2);
   }
-  .worklist button.on{border-color:var(--navy);background:#eaeef6;color:var(--navy);font-weight:700;}
+  .worklist button.on{border-color:var(--navy);background:var(--tint);color:var(--navy);font-weight:700;}
   .photo-by{
     display:flex;align-items:center;gap:7px;padding:10px 18px 0;font-size:12px;color:var(--sub);
   }
@@ -182,12 +238,12 @@
   .chiprow{display:flex;flex-wrap:wrap;gap:8px;}
   .chiprow button{
     padding:9px 14px;border-radius:999px;border:1.5px solid var(--line);
-    background:#fafafb;font-size:14px;color:#555;
+    background:var(--soft);font-size:14px;color:var(--text2);
   }
-  .chiprow button.on{border-color:var(--navy);background:#eaeef6;color:var(--navy);font-weight:700;}
+  .chiprow button.on{border-color:var(--navy);background:var(--tint);color:var(--navy);font-weight:700;}
   .tag{
     display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;
-    background:#eaeef6;color:var(--navy);border-radius:999px;padding:4px 10px;margin:8px 6px 0 0;
+    background:var(--tint);color:var(--navy);border-radius:999px;padding:4px 10px;margin:8px 6px 0 0;
   }
   /* 区間（聖地と聖地のあいだ） */
   .leg{display:flex;align-items:center;gap:8px;padding:6px 0 6px 12px;position:relative;}
@@ -197,7 +253,7 @@
   }
   .leg .legin{display:flex;gap:8px;flex:1;margin-left:22px;}
   .leg select,.leg input{
-    border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#fafafb;
+    border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--soft);
     outline:none;font-size:14px;min-width:0;
   }
   .leg select{flex:0 0 42%;}
@@ -214,7 +270,7 @@
   }
   .photo-pin .pp-img{
     width:46px;height:46px;border-radius:50%;overflow:hidden;
-    border:3px solid currentColor;box-sizing:border-box;background:#e6e8ee;
+    border:3px solid currentColor;box-sizing:border-box;background:var(--track);
   }
   .photo-pin .pp-img img{width:100%;height:100%;object-fit:cover;display:block;}
   .photo-pin::after{
@@ -222,8 +278,8 @@
     border-left:6px solid transparent;border-right:6px solid transparent;
     border-top:10px solid currentColor;
   }
-  .photo-pin.ring-red{color:#d7263d;}
-  .photo-pin.ring-navy{color:#1b2a49;}
+  .photo-pin.ring-red{color:var(--red);}
+  .photo-pin.ring-navy{color:var(--tintText);}
 
   .pin{width:32px;height:42px;cursor:pointer;line-height:0;}
   .pin svg{width:32px;height:42px;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));}
@@ -234,7 +290,7 @@
   /* 登録バナー */
   #addBanner{
     position:absolute;left:12px;right:12px;bottom:16px;z-index:8;display:none;
-    background:var(--navy);color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 6px 22px rgba(0,0,0,.3);
+    background:var(--navy);color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 6px 22px var(--sh2);
   }
   #addBanner p{margin:0 0 10px;font-size:13px;}
   #addBanner .row{display:flex;gap:8px;}
@@ -245,8 +301,8 @@
     background:rgba(255,255,255,.96);color:var(--text);outline:none;font-size:15px;
   }
   #pickSuggest{
-    position:absolute;bottom:48px;left:0;right:0;background:#fff;border-radius:12px;
-    overflow:hidden;max-height:44vh;overflow-y:auto;display:none;box-shadow:0 6px 24px rgba(0,0,0,.35);
+    position:absolute;bottom:48px;left:0;right:0;background:var(--card);border-radius:12px;
+    overflow:hidden;max-height:44vh;overflow-y:auto;display:none;box-shadow:0 6px 24px var(--sh2);
   }
   #pickSuggest .p-item{padding:11px 14px;border-bottom:1px solid var(--line);color:var(--text);}
   #pickSuggest .p-item:last-child{border-bottom:none;}
@@ -261,19 +317,19 @@
 
   #styleSheet{
     position:absolute;left:12px;right:12px;bottom:16px;z-index:9;display:none;
-    background:#fff;border-radius:16px;padding:8px;box-shadow:0 6px 26px rgba(0,0,0,.25);
+    background:var(--card);border-radius:16px;padding:8px;box-shadow:0 6px 26px var(--sh);
   }
   #styleSheet button{display:block;width:100%;text-align:left;padding:13px 14px;border-radius:10px;font-size:15px;}
-  #styleSheet button.on{background:#f6f6f8;font-weight:700;color:var(--red);}
+  #styleSheet button.on{background:var(--fill);font-weight:700;color:var(--red);}
 
   /* ---------- 詳細シート ---------- */
-  #sheetMask{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:800;display:none;}
+  #sheetMask{position:absolute;inset:0;background:var(--sh2);z-index:800;display:none;}
   #sheet{
-    position:absolute;left:0;right:0;bottom:0;z-index:850;background:#fff;border-radius:20px 20px 0 0;
-    max-height:88%;display:none;flex-direction:column;box-shadow:0 -6px 26px rgba(0,0,0,.22);
+    position:absolute;left:0;right:0;bottom:0;z-index:850;background:var(--card);border-radius:20px 20px 0 0;
+    max-height:88%;display:none;flex-direction:column;box-shadow:0 -6px 26px var(--sh);
   }
   #sheet .grip{
-    width:40px;height:5px;border-radius:3px;background:#d5d5db;margin:0 auto;flex:none;
+    width:40px;height:5px;border-radius:3px;background:var(--dotoff);margin:0 auto;flex:none;
     box-sizing:content-box;padding:9px 40px;background-clip:content-box;cursor:grab;
   }
   #sheetBody{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(20px + var(--safe-b));}
@@ -290,38 +346,38 @@
   .gallery img{
     flex:0 0 calc(100% - 36px);aspect-ratio:16/9;max-height:28vh;
     object-fit:cover;border-radius:14px;
-    scroll-snap-align:center;scroll-snap-stop:always;display:block;background:#eceff2;
+    scroll-snap-align:center;scroll-snap-stop:always;display:block;background:var(--track);
   }
   .gal-count{
     position:absolute;right:28px;top:24px;background:rgba(0,0,0,.55);color:#fff;
     border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;pointer-events:none;
   }
   .dots{display:flex;justify-content:center;align-items:center;gap:6px;padding:12px 0 0;}
-  .dots i{width:6px;height:6px;border-radius:3px;background:#d5d5db;display:block;transition:.2s;}
+  .dots i{width:6px;height:6px;border-radius:3px;background:var(--dotoff);display:block;transition:.2s;}
   .dots i.on{background:var(--red);width:18px;}
   .sheet-pad{padding:16px 18px 0;}
   .sheet-title{display:flex;align-items:flex-start;gap:10px;}
   .sheet-title h2{margin:0;font-size:22px;font-weight:800;flex:1;line-height:1.3;}
-  .closeX{flex:none;width:32px;height:32px;border-radius:50%;background:#f1f1f4;font-size:18px;color:#555;}
+  .closeX{flex:none;width:32px;height:32px;border-radius:50%;background:var(--fill);font-size:18px;color:var(--text2);}
   .work{color:var(--sub);font-size:14px;margin:4px 0 0;}
   .wcat{
-    display:inline-block;background:#eaeef6;color:var(--navy);border-radius:5px;
+    display:inline-block;background:var(--tint);color:var(--navy);border-radius:5px;
     padding:1px 7px;margin-right:5px;font-size:.86em;font-weight:700;letter-spacing:.02em;
   }
-  .wsep{color:#c9c9d1;margin:0 5px;}
+  .wsep{color:var(--faint);margin:0 5px;}
   .wnone{color:var(--sub);}
   .worksel span .wcat{background:rgba(27,42,73,.14);}
   .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;margin-top:10px;}
-  .badge.on{background:#fdecef;color:var(--red);}
-  .badge.off{background:#f1f1f4;color:#8a8a95;}
-  .badge.share{background:#eaeef6;color:var(--navy);}
-  .badge.count{background:#f3f0e8;color:#8a7a4a;}
+  .badge.on{background:var(--redTint);color:var(--red);}
+  .badge.off{background:var(--fill);color:var(--sub);}
+  .badge.share{background:var(--tint);color:var(--navy);}
+  .badge.count{background:var(--goldTint);color:var(--goldText);}
   .newmark{
     display:inline-block;background:var(--red);color:#fff;border-radius:5px;
     padding:1px 6px;margin-right:6px;font-size:10px;font-weight:800;
     letter-spacing:.04em;vertical-align:2px;
   }
-  .memo{white-space:pre-wrap;margin:14px 0 0;font-size:14px;color:#33333a;}
+  .memo{white-space:pre-wrap;margin:14px 0 0;font-size:14px;color:var(--text);}
   .meta{margin-top:14px;font-size:12px;color:var(--sub);}
   .visit-wrap{padding:16px 18px 0;}
   .visit-btn{
@@ -333,16 +389,16 @@
   .visit-btn .vi{width:22px;height:22px;flex:none;}
   .visit-btn:active{transform:scale(.97);}
   .visit-btn.again{
-    background:#fff;color:var(--red);border:2px solid var(--red);
+    background:var(--card);color:var(--red);border:2px solid var(--red);
     box-shadow:none;font-size:16px;padding:15px 16px;
   }
   .sheet-actions{display:flex;flex-wrap:wrap;gap:8px;padding:16px 18px 0;}
   .sheet-actions button{flex:1;min-width:120px;padding:12px;border-radius:12px;font-size:14px;font-weight:700;border:1px solid var(--line);}
   .act-visit{background:var(--red);color:#fff;border-color:var(--red)!important;}
-  .act-unvisit{background:#fff;color:var(--red);border-color:var(--red)!important;}
+  .act-unvisit{background:var(--card);color:var(--red);border-color:var(--red)!important;}
   .act-main{background:var(--navy);color:#fff;border-color:var(--navy)!important;}
-  .act-edit{background:#f6f6f8;color:#333;}
-  .act-del{background:#fff;color:#c0392b;flex:0 0 52px!important;min-width:52px!important;}
+  .act-edit{background:var(--fill);color:var(--text);}
+  .act-del{background:var(--card);color:var(--danger);flex:0 0 52px!important;min-width:52px!important;}
   .thumbs{display:flex;gap:8px;overflow-x:auto;padding:14px 18px 0;align-items:center;}
   .thumbs img{width:88px;height:88px;object-fit:cover;border-radius:10px;flex:none;}
   .thumbs .ph-wrap{position:relative;flex:none;line-height:0;}
@@ -353,10 +409,10 @@
   .thumbs .photo-add{flex:none;}
 
   /* ---------- フォーム ---------- */
-  #formPage{position:absolute;inset:0;z-index:900;background:#fff;display:none;flex-direction:column;}
+  #formPage{position:absolute;inset:0;z-index:900;background:var(--card);display:none;flex-direction:column;}
   .topbar{
     display:flex;align-items:center;gap:12px;padding:calc(10px + var(--safe-t)) 14px 10px;
-    border-bottom:1px solid var(--line);flex:none;background:#fff;
+    border-bottom:1px solid var(--line);flex:none;background:var(--card);
   }
   .topbar h3{margin:0;font-size:16px;font-weight:800;flex:1;text-align:center;}
   .topbar button{font-size:15px;color:var(--red);font-weight:700;}
@@ -365,14 +421,14 @@
   .field{margin-bottom:16px;}
   .field label{display:block;font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;}
   .field input[type=text],.field input[type=date],.field textarea{
-    width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;outline:none;background:#fafafb;
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;outline:none;background:var(--soft);
   }
-  .field input:focus,.field textarea:focus{border-color:var(--navy);background:#fff;}
+  .field input:focus,.field textarea:focus{border-color:var(--navy);background:var(--card);}
   .field textarea{min-height:110px;resize:vertical;line-height:1.7;}
-  .toggle{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fafafb;}
+  .toggle{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--soft);}
   .toggle span{font-size:15px;font-weight:600;}
-  .sw{width:50px;height:30px;border-radius:999px;background:#d5d5db;position:relative;transition:.2s;flex:none;}
-  .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .sw{width:50px;height:30px;border-radius:999px;background:var(--dotoff);position:relative;transition:.2s;flex:none;}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--card);transition:.2s;box-shadow:0 1px 3px var(--sh2);}
   .sw.on{background:var(--red);}
   .sw.on::after{left:23px;}
   .photo-grid{display:flex;flex-wrap:wrap;gap:8px;}
@@ -383,11 +439,11 @@
     background:rgba(0,0,0,.65);color:#fff;font-size:12px;line-height:20px;text-align:center;
   }
   .photo-add{
-    width:82px;height:82px;border-radius:10px;border:1.5px dashed #ccc;color:#999;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;background:#fafafb;
+    width:82px;height:82px;border-radius:10px;border:1.5px dashed var(--line2);color:var(--sub);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;background:var(--soft);
   }
   /* プロフィール・コメント */
-  .avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:none;background:#e6e8ee;}
+  .avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:none;background:var(--track);}
   .avatar-ph{
     width:34px;height:34px;border-radius:50%;flex:none;background:var(--navy);color:#fff;
     display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;
@@ -397,7 +453,7 @@
   .byline span{font-size:11px;color:var(--sub);}
   .my-sec{padding:16px 18px 0;border-top:1px solid var(--line);margin-top:18px;}
   .my-sec h4{margin:0 0 10px;font-size:13px;font-weight:800;color:var(--navy);}
-  .my-sec .mymemo{white-space:pre-wrap;margin:0 0 10px;font-size:14px;color:#33333a;}
+  .my-sec .mymemo{white-space:pre-wrap;margin:0 0 10px;font-size:14px;color:var(--text);}
   .my-sec .myempty{margin:0 0 10px;font-size:12.5px;color:var(--sub);line-height:1.7;}
   .my-sec .myphotos{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;}
   .my-sec .myphotos img{width:84px;height:84px;object-fit:cover;border-radius:10px;flex:none;}
@@ -406,7 +462,7 @@
   .orphan-row .oi{flex:1;min-width:0;}
   .orphan-row .oi b{display:block;font-size:14px;}
   .orphan-row .oi span{font-size:11.5px;color:var(--sub);}
-  .orphan-row button{flex:none;padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:#f6f6f8;}
+  .orphan-row button{flex:none;padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--fill);}
   .orphan-row button.reg{background:var(--navy);color:#fff;border-color:var(--navy);}
   .cmt-sec{padding:18px 18px 0;border-top:1px solid var(--line);margin-top:18px;}
   .cmt-sec h4{margin:0 0 12px;font-size:14px;font-weight:800;}
@@ -416,12 +472,12 @@
   .cmt .cmt-head b{font-size:13px;font-weight:700;}
   .cmt .cmt-head span{font-size:11px;color:var(--sub);}
   .cmt p{margin:2px 0 0;font-size:14px;white-space:pre-wrap;word-break:break-word;}
-  .cmt button{width:26px;height:26px;border-radius:50%;background:#f1f1f4;color:#9a9aa4;flex:none;font-size:13px;}
+  .cmt button{width:26px;height:26px;border-radius:50%;background:var(--fill);color:var(--sub);flex:none;font-size:13px;}
   .cmt-empty{font-size:13px;color:var(--sub);margin:0 0 14px;}
   .cmt-form{display:flex;gap:8px;align-items:flex-end;padding-bottom:4px;}
   .cmt-form textarea{
     flex:1;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
-    background:#fafafb;outline:none;min-height:44px;max-height:120px;font-size:15px;line-height:1.6;resize:vertical;
+    background:var(--soft);outline:none;min-height:44px;max-height:120px;font-size:15px;line-height:1.6;resize:vertical;
   }
   .cmt-form button{
     flex:none;background:var(--navy);color:#fff;border-radius:12px;padding:12px 16px;font-size:14px;font-weight:700;
@@ -430,72 +486,108 @@
   .prof-edit .avatar,.prof-edit .avatar-ph{width:64px;height:64px;font-size:26px;}
   .prof-edit .prof-right{flex:1;min-width:0;}
   .prof-edit input{
-    width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:#fafafb;outline:none;
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--soft);outline:none;
   }
   .prof-hint{font-size:11px;color:var(--sub);margin:6px 0 0;}
 
   .visit-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
   .visit-row span{font-size:12px;color:var(--sub);width:52px;flex:none;font-weight:700;}
-  .visit-row input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fafafb;outline:none;}
-  .visit-row button{width:32px;height:32px;border-radius:50%;background:#f1f1f4;color:#8a8a95;flex:none;font-size:15px;}
+  .visit-row input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft);outline:none;}
+  .visit-row button{width:32px;height:32px;border-radius:50%;background:var(--fill);color:var(--sub);flex:none;font-size:15px;}
   .coord{font-size:12px;color:var(--sub);}
-  .pickmap{width:100%;padding:11px;border-radius:12px;background:#f2f3f6;font-size:13px;font-weight:700;color:var(--navy);margin-top:6px;}
+  .pickmap{width:100%;padding:11px;border-radius:12px;background:var(--fill);font-size:13px;font-weight:700;color:var(--navy);margin-top:6px;}
   .hint{font-size:11px;color:var(--sub);margin:-8px 0 16px;line-height:1.7;}
 
   /* ---------- リスト ---------- */
-  #listPage{overflow-y:auto;-webkit-overflow-scrolling:touch;background:#f7f7f9;}
+  #listPage{overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--fill);}
   .list-head{
-    padding:calc(14px + var(--safe-t)) 18px 12px;background:#fff;border-bottom:1px solid var(--line);
+    padding:calc(14px + var(--safe-t)) 18px 12px;background:var(--card);border-bottom:1px solid var(--line);
     position:sticky;top:0;z-index:5;
   }
   .list-head h1{margin:0;font-size:20px;font-weight:800;}
   .stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-  .stat{flex:1;background:#f6f6f8;border-radius:12px;padding:10px;text-align:center;}
+  .stat{flex:1;background:var(--fill);border-radius:12px;padding:10px;text-align:center;}
   .stat b{display:block;font-size:20px;font-weight:800;color:var(--navy);}
   .stat span{font-size:11px;color:var(--sub);}
-  .bar{height:6px;border-radius:3px;background:#ececed;margin-top:10px;overflow:hidden;}
+  .bar{height:6px;border-radius:3px;background:var(--track);margin-top:10px;overflow:hidden;}
   .bar i{display:block;height:100%;background:var(--red);border-radius:3px;transition:.3s;}
   .filters{display:flex;gap:7px;padding:12px 18px 4px;overflow-x:auto;}
-  .chip{flex:none;padding:7px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px;color:#555;}
+  .chip{flex:none;padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;color:var(--text2);}
   .chip.on{background:var(--navy);color:#fff;border-color:var(--navy);}
   .me-dot{
     width:16px;height:16px;border-radius:50%;background:#2f7cf6;
-    border:3px solid #fff;box-shadow:0 0 0 1px rgba(47,124,246,.4),0 2px 6px rgba(0,0,0,.3);
+    border:3px solid #fff;box-shadow:0 0 0 1px rgba(47,124,246,.4),0 2px 6px var(--sh2);
   }
   .card .dist{
     flex:none;align-self:flex-start;font-size:12px;font-weight:700;color:var(--navy);
-    background:#eaeef6;border-radius:999px;padding:3px 9px;
+    background:var(--tint);border-radius:999px;padding:3px 9px;
   }
   #sortRow .sep{flex:none;width:1px;background:var(--line);margin:4px 2px;}
   .cards{padding:8px 14px calc(20px + var(--safe-b));}
-  .card{display:flex;gap:12px;background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-  .card .thumb{width:66px;height:66px;border-radius:10px;object-fit:cover;background:#eceff2;flex:none;}
+  .card{display:flex;gap:12px;background:var(--card);border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 4px var(--sh);}
+  .card .thumb{width:66px;height:66px;border-radius:10px;object-fit:cover;background:var(--track);flex:none;}
   .card .thumb.ph{display:flex;align-items:center;justify-content:center;font-size:22px;}
   .card .info{flex:1;min-width:0;}
   .card .info h4{margin:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .card .info p{margin:2px 0 0;font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .card .info .b{font-size:11px;font-weight:700;margin-top:6px;display:inline-block;padding:3px 9px;border-radius:999px;}
+  .card .info .b.bv{background:var(--redTint);color:var(--red);}
+  .card .info .b.ba{background:var(--tint);color:var(--tintText);}
+  .card .info .b.bc{background:var(--goldTint);color:var(--goldText);margin-left:5px;}
+
+  /* ---------- 画面の明るさ ---------- */
+  .themerow{display:flex;gap:8px;}
+  .themerow button{
+    flex:1;padding:11px 6px;border-radius:12px;border:1.5px solid var(--line);
+    background:var(--soft);color:var(--sub);font-size:13px;font-weight:700;
+  }
+  .themerow button.on{border-color:var(--navy);background:var(--tint);color:var(--tintText);}
+
+  /* ---------- 更新のお知らせ ---------- */
+  #noteMask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2500;display:none;}
+  #noteBox{
+    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2501;display:none;
+    width:min(420px, calc(100% - 36px));max-height:78vh;overflow-y:auto;
+    background:var(--card);border-radius:20px;padding:22px 20px 18px;box-shadow:0 12px 40px var(--sh2);
+  }
+  #noteBox .nv{
+    display:inline-block;background:var(--tint);color:var(--tintText);border-radius:999px;
+    padding:4px 11px;font-size:11px;font-weight:800;letter-spacing:.03em;
+  }
+  #noteBox h3{margin:10px 0 14px;font-size:19px;font-weight:800;line-height:1.4;}
+  #noteBox ul{margin:0;padding:0;list-style:none;}
+  #noteBox li{
+    position:relative;padding:0 0 0 22px;margin-bottom:12px;font-size:14px;line-height:1.75;color:var(--text2);
+  }
+  #noteBox li::before{
+    content:"";position:absolute;left:4px;top:9px;width:7px;height:7px;
+    border-radius:50%;background:var(--red);
+  }
+  #noteOk{
+    width:100%;margin-top:6px;padding:15px;border-radius:14px;
+    background:var(--navy);color:#fff;font-size:15px;font-weight:800;
+  }
   .empty{text-align:center;padding:56px 30px;color:var(--sub);font-size:14px;line-height:1.9;}
   .empty .big{font-size:40px;margin-bottom:10px;}
 
   /* ---------- 設定 ---------- */
-  #setPage{overflow-y:auto;background:#f7f7f9;}
-  .set-sec{background:#fff;margin:12px 14px;border-radius:14px;overflow:hidden;}
+  #setPage{overflow-y:auto;background:var(--fill);}
+  .set-sec{background:var(--card);margin:12px 14px;border-radius:14px;overflow:hidden;}
   .set-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 16px;border-bottom:1px solid var(--line);}
   .set-item:last-child{border-bottom:none;}
   .set-item small{display:block;color:var(--sub);font-size:11px;margin-top:2px;}
   .set-item .go{color:var(--red);font-weight:700;font-size:14px;white-space:nowrap;}
-  .danger{color:#c0392b!important;}
-  .set-note{padding:6px 20px 30px;color:#9a9aa4;font-size:11px;line-height:1.8;}
+  .danger{color:var(--danger)!important;}
+  .set-note{padding:6px 20px 30px;color:var(--sub);font-size:11px;line-height:1.8;}
   .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px;}
   .dot.ok{background:#2e9e57;}
-  .dot.ng{background:#c0392b;}
+  .dot.ng{background:var(--danger);}
 
   #nav{
-    flex:none;display:flex;background:#fff;border-top:1px solid var(--line);
+    flex:none;display:flex;background:var(--card);border-top:1px solid var(--line);
     padding-bottom:var(--safe-b);height:calc(var(--nav-h) + var(--safe-b));
   }
-  #nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a9aa4;font-size:10px;font-weight:700;}
+  #nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sub);font-size:10px;font-weight:700;}
   #nav button.on{color:var(--navy);}
   #nav svg{width:22px;height:22px;}
 
@@ -559,7 +651,7 @@
       <button id="workBtn" class="fab" aria-label="作品でしぼる"><span>作品</span></button>
       <button id="styleBtn" class="fab" aria-label="地図の種類">🗺</button>
       <button id="locBtn" class="fab" aria-label="現在地">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1b2a49" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke-linecap="round"/></svg>
       </button>
 
       <div id="styleSheet"></div>
@@ -617,7 +709,7 @@
     </div>
 
     <!-- ===== コース作成 ===== -->
-    <div id="coursePage2" style="position:absolute;inset:0;z-index:900;background:#fff;display:none;flex-direction:column;">
+    <div id="coursePage2" style="position:absolute;inset:0;z-index:900;background:var(--card);display:none;flex-direction:column;">
       <div class="topbar">
         <button class="cancel" id="cCancel">キャンセル</button>
         <h3 id="cPageTitle">コースを作る</h3>
@@ -664,12 +756,22 @@
         </div>
       </div>
       <div class="set-sec">
+        <div class="set-item" style="display:block;">
+          <div style="margin-bottom:4px;">画面の明るさ</div>
+          <small style="display:block;color:var(--sub);font-size:11px;margin-bottom:10px;">暗くすると、夜でも目が疲れにくくなります</small>
+          <div class="themerow" id="themeRow"></div>
+        </div>
+      </div>
+      <div class="set-sec">
         <div class="set-item">
           <div><div>オンライン接続</div><small id="sbState">確認しています…</small></div>
           <div class="go" id="btnReload">最新にする</div>
         </div>
         <div class="set-item" id="btnAdmin" style="display:none;">
           <div><div>管理用の合言葉</div><small id="adminState">なし</small></div><div class="go">入力</div>
+        </div>
+        <div class="set-item" id="btnNote" style="display:none;">
+          <div><div>このバージョンの変更点</div><small>前回の更新で何が変わったかを見ます</small></div><div class="go">見る</div>
         </div>
         <div class="set-item admin-only" id="btnStats" style="display:none;">
           <div><div>利用状況</div><small id="statsState">使っている人の数などを見る</small></div><div class="go">見る</div>
@@ -797,6 +899,14 @@
   </div>
 </div>
 
+<div id="noteMask"></div>
+<div id="noteBox">
+  <span class="nv">アップデート</span>
+  <h3 id="noteTitle"></h3>
+  <ul id="noteList"></ul>
+  <button id="noteOk">はじめる</button>
+</div>
+
 <div id="lightbox">
   <div id="lbTrack"></div>
   <div id="lbCount"></div>
@@ -817,7 +927,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.051";
+var APP_VERSION = "1.052";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -833,6 +943,9 @@ var KEY_ORPHAN = "conan-seichi-orphans";  // 聖地とひもづかなかった�
 var KEY_MIGRATED = "conan-seichi-migrated";
 var KEY_VISITSYNC = "conan-seichi-visitsync";
 var KEY_STYLE = "conan-seichi-style";
+var KEY_STYLEMANUAL = "conan-seichi-stylemanual";
+var KEY_THEME = "conan-seichi-theme";     // auto / light / dark
+var KEY_NOTED = "conan-seichi-noted";     // お知らせを見たバージョン
 var KEY_NICK  = "conan-seichi-nick";
 var KEY_TOKEN = "conan-seichi-tokens";
 var KEY_ADMIN = "conan-seichi-admin";
@@ -856,14 +969,17 @@ function rasterStyle(tiles, attribution, maxzoom){
   };
 }
 var GSI = '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">国土地理院</a>';
+var CARTO = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>';
 var STYLES = [
   { id:"ofm-liberty",  label:"標準（ベクター）", style:"https://tiles.openfreemap.org/styles/liberty", vector:true },
   { id:"ofm-bright",   label:"ブライト",         style:"https://tiles.openfreemap.org/styles/bright",  vector:true },
   { id:"ofm-positron", label:"シンプル（淡色）", style:"https://tiles.openfreemap.org/styles/positron", vector:true },
   { id:"gsi-pale",     label:"地理院地図 淡色（日本詳細）", style: rasterStyle("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", GSI) },
   { id:"gsi-std",      label:"地理院地図 標準（日本詳細）", style: rasterStyle("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", GSI) },
-  { id:"gsi-photo",    label:"航空写真", style: rasterStyle("https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg", GSI, 18) }
+  { id:"gsi-photo",    label:"航空写真", style: rasterStyle("https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg", GSI, 18) },
+  { id:"carto-dark",   label:"ダーク（暗い地図）", style: rasterStyle("https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png", CARTO, 19), dark:true }
 ];
+var LIGHT_MAPS = ["ofm-liberty","ofm-bright","ofm-positron"];
 function styleById(id){
   for(var i=0;i<STYLES.length;i++) if(STYLES[i].id===id) return STYLES[i];
   return STYLES[0];
@@ -878,6 +994,14 @@ var nickname = localStorage.getItem(KEY_NICK) || "";
 var adminKey = localStorage.getItem(KEY_ADMIN) || "";
 var moveTarget = null;
 var styleKey = localStorage.getItem(KEY_STYLE) || STYLES[0].id;
+var theme    = localStorage.getItem(KEY_THEME) || "auto";
+/* このアプリを前から使っているか。保存処理が走ると判定できなくなるので、いちばん先に見ておく */
+var HAD_DATA = !!(localStorage.getItem(KEY_NOTED)  || localStorage.getItem(KEY_LOG)
+               || localStorage.getItem(KEY_SPOTS)  || localStorage.getItem(KEY_TOKEN)
+               || localStorage.getItem(KEY_NICK)   || localStorage.getItem(KEY_STYLE));
+/* 昔から使っている人は、地図の種類をすでに自分で選んでいるとみなす */
+var mapStyleManual = localStorage.getItem(KEY_STYLEMANUAL) === "1"
+                  || !!localStorage.getItem(KEY_STYLE);
 var filter   = "all";
 var editingId = null;
 var draft = null;
@@ -1414,8 +1538,9 @@ function fitAll(){
 var PIN_PATH = "M16 1.6c-7.1 0-12.9 5.8-12.9 12.9 0 3.5 1.6 7.4 4 11.2 2.4 3.8 5.4 7.3 7.6 9.6.7.8 1.9.8 2.6 0 2.2-2.3 5.2-5.8 7.6-9.6 2.4-3.8 4-7.7 4-11.2C28.9 7.4 23.1 1.6 16 1.6z";
 function pinSvg(kind){
   var fill, stroke, dot;
+  var darkMap = (styleKey === "carto-dark" || styleKey === "gsi-photo");
   if(kind === "visited" || kind === "added"){ fill="#d7263d"; stroke="#ffffff"; dot="#ffffff"; }
-  else if(kind === "shared"){ fill="#1b2a49"; stroke="#ffffff"; dot="#ffffff"; }
+  else if(kind === "shared"){ fill = darkMap ? "#4a6bb8" : "#1b2a49"; stroke="#ffffff"; dot="#ffffff"; }
   else { fill="#ffffff"; stroke="#d7263d"; dot="#d7263d"; }
   return '<svg viewBox="0 0 32 42">'
     + '<path d="'+PIN_PATH+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2.4" stroke-linejoin="round"/>'
@@ -1588,7 +1713,7 @@ function drawLabels(list){
     if(map.getSource("spot-labels")){ map.getSource("spot-labels").setData(data); return; }
     map.addSource("spot-labels", { type:"geojson", data:data });
     // 航空写真のときは白文字にして読みやすくする
-    var dark = (styleKey === "gsi-photo");
+    var dark = (styleKey === "gsi-photo" || styleKey === "carto-dark");
     map.addLayer({
       id:"spot-labels", type:"symbol", source:"spot-labels", minzoom:10.5,
       layout:{
@@ -2447,14 +2572,72 @@ document.getElementById("styleBtn").addEventListener("click", function(){
 styleSheet.addEventListener("click", function(e){
   var b = e.target.closest("button[data-s]");
   if(!b) return;
-  styleKey = b.dataset.s;
-  localStorage.setItem(KEY_STYLE, styleKey);
+  setMapStyle(b.dataset.s);
+  mapStyleManual = true;
+  try{ localStorage.setItem(KEY_STYLEMANUAL, "1"); }catch(e2){}
   styleSheet.style.display = "none";
+});
+function setMapStyle(id){
+  if(styleKey === id) return;
+  styleKey = id;
+  try{ localStorage.setItem(KEY_STYLE, styleKey); }catch(e){}
+  renderStyleSheet();
   if(map){
     map.setStyle(styleById(styleKey).style);
     map.once("idle", function(){ applyJapanese(); renderMarkers(); showMyPos(); });
   }
+}
+
+/* ================= 画面の明るさ（配色） ================= */
+var THEMES = [
+  { id:"auto",  label:"端末に合わせる" },
+  { id:"light", label:"明るい" },
+  { id:"dark",  label:"暗い" }
+];
+function prefersDark(){
+  try{ return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }
+  catch(e){ return false; }
+}
+function isDark(){ return theme === "dark" || (theme === "auto" && prefersDark()); }
+function applyTheme(){
+  var dark = isDark();
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  var m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content", dark ? "#15171d" : "#1b2a49");
+  var sb = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if(sb) sb.setAttribute("content", dark ? "black-translucent" : "default");
+  // 地図の種類を自分で選んでいない人は、配色に合わせて地図も切り替える
+  if(!mapStyleManual){
+    if(dark && LIGHT_MAPS.indexOf(styleKey) >= 0) setMapStyle("carto-dark");
+    else if(!dark && styleKey === "carto-dark") setMapStyle("ofm-liberty");
+  }
+  renderThemeRow();
+}
+function renderThemeRow(){
+  var el = document.getElementById("themeRow");
+  if(!el) return;
+  el.innerHTML = THEMES.map(function(t){
+    return '<button data-t="'+t.id+'" class="'+(theme===t.id?"on":"")+'">'+t.label+'</button>';
+  }).join("");
+}
+document.getElementById("themeRow").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-t]");
+  if(!b) return;
+  theme = b.dataset.t;
+  try{ localStorage.setItem(KEY_THEME, theme); }catch(e2){}
+  applyTheme();
+  if(theme === "dark" && mapStyleManual && styleKey !== "carto-dark"){
+    toast("地図も暗くしたいときは 🗺 から「ダーク」を選べます");
+  }
 });
+try{
+  if(window.matchMedia){
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    var onSys = function(){ if(theme === "auto") applyTheme(); };
+    if(mq.addEventListener) mq.addEventListener("change", onSys);
+    else if(mq.addListener) mq.addListener(onSys);
+  }
+}catch(e){}
 
 /* ================= 位置選択 ================= */
 var addBanner = document.getElementById("addBanner");
@@ -3098,10 +3281,10 @@ function renderList(){
       : '<div class="thumb ph">📍</div>';
     var v = visitsOf(s);
     var badge = v.length
-      ? '<span class="b" style="background:#fdecef;color:#d7263d;">✓ '+v.length+'回訪問'+(v[0] ? ' ・初回 '+esc(fmtDate(v[0])) : '')+'</span>'
-      : (s.author ? '<span class="b" style="background:#eaeef6;color:#1b2a49;">'+esc(s.author)+'</span>' : '');
+      ? '<span class="b bv">✓ '+v.length+'回訪問'+(v[0] ? ' ・初回 '+esc(fmtDate(v[0])) : '')+'</span>'
+      : (s.author ? '<span class="b ba">'+esc(s.author)+'</span>' : '');
     if(s.add_count > 0){
-      badge += '<span class="b" style="background:#f3f0e8;color:#8a7a4a;margin-left:5px;">'+s.add_count+'人が訪問</span>';
+      badge += '<span class="b bc">'+s.add_count+'人が訪問</span>';
     }
     var subHtml = worksOf(s).length ? workLabelHtml(s) : esc(s.addr || "作品未設定");
     var dist = nearMode ? '<div class="dist">'+esc(fmtDist(distM(myPos, s)))+'</div>' : '';
@@ -3987,6 +4170,56 @@ function openOrphanRegister(o){
 }
 document.getElementById("btnOrphans").addEventListener("click", openOrphans);
 
+/* ================= 更新のお知らせ =================
+   大きな変更があった版だけ、ここに書く。
+   書かなかった版では何も出ない（細かい修正で毎回ポップアップしないように）。
+   ・キーは APP_VERSION と同じ文字列にすること
+   ・初めてこのアプリを使う人には出さない（「変わったこと」は意味がないため） */
+var RELEASE_NOTES = {
+  "1.052": {
+    title: "聖地の記録が、ひとつになりました",
+    items: [
+      "「みんなの聖地」と「自分の記録」を1つにまとめました。聖地を開いて大きな「訪問済みにする」を押すだけで記録できます",
+      "訪問日・自分だけのメモ・自分だけの写真は、聖地ごとに残せます。これまでどおり他の人には見えません",
+      "前に付けていた記録は、そのまま引き継いでいます。引き継げなかったものは設定に一覧で出ています",
+      "画面を暗くできるようになりました。設定の「画面の明るさ」から選べます"
+    ]
+  }
+};
+var noteMask = document.getElementById("noteMask");
+var noteBox  = document.getElementById("noteBox");
+function renderNote(note){
+  document.getElementById("noteTitle").textContent = note.title;
+  document.getElementById("noteList").innerHTML =
+    note.items.map(function(t){ return "<li>" + esc(t) + "</li>"; }).join("");
+  noteMask.style.display = "block";
+  noteBox.style.display = "block";
+  noteBox.scrollTop = 0;
+}
+function closeNote(){
+  noteMask.style.display = "none";
+  noteBox.style.display = "none";
+}
+document.getElementById("noteOk").addEventListener("click", closeNote);
+noteMask.addEventListener("click", closeNote);
+document.getElementById("btnNote").addEventListener("click", function(){
+  var note = RELEASE_NOTES[APP_VERSION];
+  if(note) renderNote(note);
+});
+/* 更新後に初めて開いたときだけ出す */
+function showReleaseNote(){
+  var item = document.getElementById("btnNote");
+  var note = RELEASE_NOTES[APP_VERSION];
+  if(item) item.style.display = note ? "flex" : "none";
+  if(!note) return;
+  var seen = localStorage.getItem(KEY_NOTED);
+  if(seen === APP_VERSION) return;
+  try{ localStorage.setItem(KEY_NOTED, APP_VERSION); }catch(e){}
+  // 初めて使う人に「変わったこと」を見せても意味がないので出さない
+  if(!HAD_DATA) return;
+  setTimeout(function(){ renderNote(note); }, 700);
+}
+
 /* 訪問済みの聖地を、一度だけサーバーへ知らせる（人数の集計用） */
 function syncVisitsOnce(){
   if(!hasServer()) return;
@@ -4003,6 +4236,7 @@ function syncVisitsOnce(){
 
 /* ================= 起動 ================= */
 loadLocal();
+applyTheme();
 migrateFromPersonal();
 updateOrphanState();
 if(sortMode === "near") sortMode = "new";   // 起動直後は現在地がないので通常の並びから
@@ -4012,6 +4246,7 @@ updateProfileUI();
 updateAdminState();
 renderStyleSheet();
 initMap();
+showReleaseNote();
 renderMarkers();
 renderList();
 updateFilterBar();
