@@ -524,6 +524,47 @@
   }
   #sortRow .sep{flex:none;width:1px;background:var(--line);margin:4px 2px;}
   .cards{padding:8px 14px calc(20px + var(--safe-b));}
+  .selhead{display:flex;align-items:center;gap:10px;}
+  .selhead h1{flex:1;min-width:0;}
+  .selbtn{
+    flex:none;padding:8px 14px;border-radius:999px;background:var(--fill);
+    color:var(--text2);font-size:12.5px;font-weight:700;white-space:nowrap;
+  }
+  .selbtn.on{background:var(--navy);color:#fff;}
+  .card .selbox{
+    flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line2);
+    align-self:center;position:relative;background:var(--card);
+  }
+  .card.sel .selbox{background:var(--red);border-color:var(--red);}
+  .card.sel .selbox::after{
+    content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;
+    border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);
+  }
+  .card.sel{box-shadow:0 0 0 2px var(--red), 0 1px 4px var(--sh);}
+  #listPage.selecting .cards{padding-bottom:170px;}
+  #selBar{
+    position:fixed;left:0;right:0;bottom:calc(var(--nav-h) + var(--safe-b));z-index:30;display:none;
+    background:var(--card);border-top:1px solid var(--line);
+    padding:12px 16px 14px;box-shadow:0 -5px 20px var(--sh);
+  }
+  #selBar .top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  #selBar .cnt{flex:1;font-size:14px;font-weight:800;}
+  #selBar .cnt b{color:var(--red);font-size:17px;}
+  #selBar .mini{
+    flex:none;padding:8px 12px;border-radius:10px;background:var(--fill);
+    color:var(--text2);font-size:12.5px;font-weight:700;white-space:nowrap;
+  }
+  #selBar .daterow{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  #selBar .daterow span{font-size:12px;color:var(--sub);font-weight:700;flex:none;}
+  #selBar .daterow input{
+    flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+    background:var(--soft);outline:none;font-size:14px;min-width:0;
+  }
+  #selApply{
+    width:100%;padding:15px;border-radius:14px;background:var(--red);color:#fff;
+    font-size:15.5px;font-weight:800;
+  }
+  #selApply:disabled{background:var(--fill);color:var(--faint);}
   .card{display:flex;gap:12px;background:var(--card);border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 4px var(--sh);}
   .card .thumb{width:66px;height:66px;border-radius:10px;object-fit:cover;background:var(--track);flex:none;}
   .card .thumb.ph{display:flex;align-items:center;justify-content:center;font-size:22px;}
@@ -683,7 +724,10 @@
     <!-- ===== リスト ===== -->
     <div class="page" id="listPage">
       <div class="list-head">
-        <h1 id="listTitle">聖地</h1>
+        <div class="selhead">
+          <h1 id="listTitle">聖地</h1>
+          <button class="selbtn" id="btnSelect">まとめて記録</button>
+        </div>
         <div class="stats" id="stats"></div>
         <div class="bar" id="barWrap"><i id="stBar" style="width:0%"></i></div>
       </div>
@@ -694,6 +738,18 @@
         <button class="chip" data-f="todo">未訪問</button>
       </div>
       <div class="cards" id="cards"></div>
+      <div id="selBar">
+        <div class="top">
+          <div class="cnt"><b id="selCount">0</b> 件を選択中</div>
+          <button class="mini" id="selAll">すべて選ぶ</button>
+          <button class="mini" id="selCancel">やめる</button>
+        </div>
+        <div class="daterow">
+          <span>訪問した日</span>
+          <input type="date" id="selDate">
+        </div>
+        <button id="selApply" disabled>訪問済みにする</button>
+      </div>
     </div>
 
     <!-- ===== コース ===== -->
@@ -927,7 +983,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.052";
+var APP_VERSION = "1.053";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -1802,6 +1858,7 @@ function flyTo(lat, lng, zoom){
 /* ================= 画面切り替え ================= */
 var PAGES = ["mapPage","listPage","coursePage","setPage"];
 function showPage(id){
+  if(id !== "listPage" && selectMode) setSelectMode(false);
   PAGES.forEach(function(p){ document.getElementById(p).classList.toggle("active", p===id); });
   Array.prototype.forEach.call(document.querySelectorAll("#nav button"), function(b){
     b.classList.toggle("on", b.dataset.p===id);
@@ -3275,6 +3332,7 @@ function renderList(){
   }
 
   updateFilterBar();
+  listShown = arr;
   cardsEl.innerHTML = arr.map(function(s){
     var th = safePhotoUrl((s.photos||[])[0])
       ? '<img class="thumb" loading="lazy" src="'+esc(safePhotoUrl(s.photos[0]))+'">'
@@ -3288,14 +3346,95 @@ function renderList(){
     }
     var subHtml = worksOf(s).length ? workLabelHtml(s) : esc(s.addr || "作品未設定");
     var dist = nearMode ? '<div class="dist">'+esc(fmtDist(distM(myPos, s)))+'</div>' : '';
-    return '<div class="card" data-id="'+esc(s.id)+'">'+th
+    var box = selectMode ? '<div class="selbox"></div>' : '';
+    var on  = (selectMode && selected[s.id]) ? " sel" : "";
+    return '<div class="card'+on+'" data-id="'+esc(s.id)+'">'+box+th
       + '<div class="info"><h4>'+newBadge(s)+esc(s.name)+'</h4><p>'+subHtml+'</p>'+badge+'</div>'+dist+'</div>';
   }).join("");
+  updateSelBar();
 }
+
+/* ---------------- まとめて訪問済みにする ---------------- */
+var selectMode = false;
+var selected = {};        // 聖地ID -> true
+var listShown = [];       // いま画面に出ている聖地（「すべて選ぶ」で使う）
+
+function setSelectMode(on){
+  selectMode = on;
+  if(!on) selected = {};
+  document.getElementById("listPage").classList.toggle("selecting", on);
+  document.getElementById("selBar").style.display = on ? "block" : "none";
+  var b = document.getElementById("btnSelect");
+  b.classList.toggle("on", on);
+  b.textContent = on ? "やめる" : "まとめて記録";
+  if(on){
+    var d = document.getElementById("selDate");
+    if(!d.value) d.value = today();
+  }
+  renderList();
+}
+function selCount(){ return Object.keys(selected).length; }
+function updateSelBar(){
+  if(!selectMode) return;
+  var n = selCount();
+  document.getElementById("selCount").textContent = n;
+  var ap = document.getElementById("selApply");
+  ap.disabled = n === 0;
+  ap.textContent = n ? n + "件を訪問済みにする" : "訪問済みにする";
+  var allOn = listShown.length > 0 && listShown.every(function(s){ return selected[s.id]; });
+  document.getElementById("selAll").textContent = allOn ? "選択を解除" : "すべて選ぶ";
+}
+document.getElementById("btnSelect").addEventListener("click", function(){
+  if(courseView){ toast("コースの表示中は使えません"); return; }
+  setSelectMode(!selectMode);
+});
+document.getElementById("selCancel").addEventListener("click", function(){ setSelectMode(false); });
+document.getElementById("selAll").addEventListener("click", function(){
+  var allOn = listShown.length > 0 && listShown.every(function(s){ return selected[s.id]; });
+  selected = {};
+  if(!allOn) listShown.forEach(function(s){ selected[s.id] = true; });
+  renderList();
+});
+document.getElementById("selApply").addEventListener("click", function(){
+  var date = document.getElementById("selDate").value || today();
+  var ids = Object.keys(selected);
+  if(!ids.length) return;
+  if(date > today() && !confirm("これから先の日付です。このまま記録しますか？")) return;
+  if(!confirm(ids.length + "件を「" + fmtDate(date) + "に訪問」として記録します。よろしいですか？")) return;
+
+  var newly = [], added = 0;
+  ids.forEach(function(id){
+    var r = ensureLog(id);
+    if(!r.visits.length) newly.push(id);
+    if(r.visits.indexOf(date) < 0){
+      r.visits.push(date);
+      r.visits = uniqSorted(r.visits);
+      added++;
+    }
+  });
+  if(!saveLog()) return;
+  setSelectMode(false);
+  renderMarkers(); renderList();
+  toast(added ? added + "件を訪問済みにしました"
+              : "選んだ聖地には、すでにこの日の記録があります");
+  // 人数の集計用に、初めて訪問済みになったぶんだけサーバーへ知らせる
+  var i = 0;
+  (function next(){
+    if(i >= newly.length){ renderList(); return; }
+    sbSetAdded(newly[i++], true, next);
+  })();
+});
 
 cardsEl.addEventListener("click", function(e){
   var c = e.target.closest(".card");
   if(!c) return;
+  if(selectMode){
+    var id = c.dataset.id;
+    if(selected[id]) delete selected[id]; else selected[id] = true;
+    c.classList.toggle("sel", !!selected[id]);
+    updateSelBar();
+    return;
+  }
   showPage("mapPage");
   setTimeout(function(){ openSheet(c.dataset.id); }, 150);
 });
@@ -3379,6 +3518,7 @@ function openCourse(c){
   var missing = (c.spot_ids||[]).filter(function(id){ return !spotById(id); }).length;
   courseView = c;
   workFilter = null; updateWorkBtn();
+  if(selectMode) setSelectMode(false);
   filter = "all";
   Array.prototype.forEach.call(document.querySelectorAll("#filters .chip"), function(x){
     x.classList.toggle("on", x.dataset.f === "all");
@@ -4176,11 +4316,12 @@ document.getElementById("btnOrphans").addEventListener("click", openOrphans);
    ・キーは APP_VERSION と同じ文字列にすること
    ・初めてこのアプリを使う人には出さない（「変わったこと」は意味がないため） */
 var RELEASE_NOTES = {
-  "1.052": {
+  "1.053": {
     title: "聖地の記録が、ひとつになりました",
     items: [
       "「みんなの聖地」と「自分の記録」を1つにまとめました。聖地を開いて大きな「訪問済みにする」を押すだけで記録できます",
       "訪問日・自分だけのメモ・自分だけの写真は、聖地ごとに残せます。これまでどおり他の人には見えません",
+      "リストの「まとめて記録」から、まわった聖地をいくつも選んで、いっぺんに訪問済みにできます",
       "前に付けていた記録は、そのまま引き継いでいます。引き継げなかったものは設定に一覧で出ています",
       "画面を暗くできるようになりました。設定の「画面の明るさ」から選べます"
     ]
