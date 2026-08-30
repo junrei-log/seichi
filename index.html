@@ -197,6 +197,26 @@
   .step .ops{display:flex;gap:4px;flex:none;}
   .step .ops button{width:30px;height:30px;border-radius:8px;background:var(--fill);color:var(--sub);font-size:13px;}
   .pickrow{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  /* コースの始め方を選ぶ */
+  .startrow{
+    display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    padding:15px 0;border-bottom:1px solid var(--line);
+  }
+  .startrow .ic{
+    flex:none;width:42px;height:42px;border-radius:12px;background:var(--tint);
+    display:flex;align-items:center;justify-content:center;font-size:20px;
+  }
+  .startrow .st{flex:1;min-width:0;}
+  .startrow .st b{display:block;font-size:15px;}
+  .startrow .st span{font-size:11.5px;color:var(--sub);line-height:1.6;}
+  .startrow .ar{flex:none;color:var(--faint);font-size:18px;}
+  .startrow[disabled]{opacity:.45;}
+  .toolrow{display:flex;gap:8px;margin-bottom:10px;}
+  .toolrow button{
+    flex:1;padding:10px 8px;border-radius:11px;background:var(--fill);
+    color:var(--text2);font-size:12.5px;font-weight:700;border:1px solid var(--line);
+  }
+  .toolrow button.on{background:var(--tint);color:var(--tintText);border-color:var(--navy);}
   .pickrow .sname{flex:1;min-width:0;}
   .pickrow button{flex:none;background:var(--navy);color:#fff;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;}
   .pickrow button.added{background:var(--soft);color:var(--sub);}
@@ -773,15 +793,20 @@
       </div>
       <div class="form-body">
         <div class="field">
-          <label>コース名 <span style="color:var(--red)">*</span></label>
-          <input type="text" id="cTitle" placeholder="例：鳥取・北栄町 半日コース" maxlength="60">
+          <label>コース名</label>
+          <input type="text" id="cTitle" placeholder="空のままでも大丈夫です" maxlength="60">
+          <p class="hint" id="cTitleHint" style="margin:6px 0 0;"></p>
         </div>
         <div class="field">
           <label>説明</label>
-          <textarea id="cMemo" placeholder="まわる順番のコツ、所要時間、移動手段など" maxlength="1000"></textarea>
+          <textarea id="cMemo" placeholder="まわる順番のコツ、見どころ、注意点など" maxlength="1000"></textarea>
         </div>
         <div class="field">
-          <label>まわる順番（2〜20か所）・区間ごとの移動手段</label>
+          <label>まわる順番（2〜20か所）</label>
+          <div class="toolrow" id="cTools">
+            <button id="cSort">近い順に並べ替え</button>
+            <button id="cDetailBtn">移動手段や時間も書く</button>
+          </div>
           <div id="cSteps"></div>
           <div id="cTotal" style="font-size:12px;color:var(--sub);margin-top:8px;"></div>
         </div>
@@ -983,7 +1008,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.053";
+var APP_VERSION = "1.054";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -3603,6 +3628,7 @@ var editingCourse = null;
 var draftSteps = [];
 var TRANSPORTS = ["徒歩", "自転車", "車", "電車", "バス", "タクシー", "その他"];
 var draftLegT = [], draftLegM = [], draftStay = [];   // 区間ごとの移動手段・所要時間／地点ごとの滞在時間
+var courseDetail = false;   // 移動手段・時間の欄を出しているか
 
 /* コース全体で使われている移動手段をまとめて出す */
 function courseTags(c){
@@ -3671,23 +3697,188 @@ function openCourseForm(){
   document.getElementById("cPageTitle").textContent = editingCourse ? "コースを編集" : "コースを作る";
   document.getElementById("cSave").textContent = editingCourse ? "保存" : "投稿";
 }
-document.getElementById("btnNewCourse").addEventListener("click", function(){
-  if(!hasServer()){ toast("オンラインにつながっていません"); return; }
-  if(shared.length < 2){ toast("聖地が2か所以上必要です"); return; }
+/* ---- コースの下ごしらえ ---- */
+var COURSE_MAX = 20;
+/* 近いところから順につないでいく（出発点は、現在地がわかっていれば一番近い聖地） */
+function orderByNearest(ids){
+  var pts = ids.map(spotById).filter(Boolean);
+  if(pts.length < 3) return pts.map(function(s){ return s.id; });
+  var rest = pts.slice(), start = 0;
+  if(myPos){
+    var bd = Infinity;
+    rest.forEach(function(s,i){ var d = distM(myPos, s); if(d < bd){ bd = d; start = i; } });
+  }
+  var out = [rest.splice(start, 1)[0]];
+  while(rest.length){
+    var last = out[out.length-1], bi = 0, best = Infinity;
+    rest.forEach(function(s,i){ var d = distM(last, s); if(d < best){ best = d; bi = i; } });
+    out.push(rest.splice(bi, 1)[0]);
+  }
+  return out.map(function(s){ return s.id; });
+}
+/* 住所から都道府県・市区町村を取り出す */
+function prefOf(a){
+  var m = String(a||"").match(/(東京都|北海道|京都府|大阪府|..県)/);
+  return m ? m[1] : "";
+}
+function cityOf(a){
+  a = String(a||"");
+  var p = prefOf(a);
+  if(!p) return "";
+  var rest = a.slice(a.indexOf(p) + p.length);
+  var m = rest.match(/^(.{1,8}?[市区町村])/);
+  return m ? m[1] : "";
+}
+/* コース名の候補を作る。全部が同じ土地／同じ作品ならそれを使う */
+function suggestCourseTitle(ids){
+  var list = ids.map(spotById).filter(Boolean);
+  if(list.length < 2) return "";
+  function allSame(f){
+    var v = f(list[0]);
+    if(!v) return "";
+    for(var i=1;i<list.length;i++) if(f(list[i]) !== v) return "";
+    return v;
+  }
+  var n = list.length + "か所コース";
+  var city = allSame(function(s){ return cityOf(s.addr); });
+  if(city) return city + " " + n;
+  var pref = allSame(function(s){ return prefOf(s.addr); });
+  if(pref) return pref + " " + n;
+  var work = allSame(function(s){ return worksOf(s)[0] || ""; });
+  if(work){
+    var w = splitWork(work);
+    return (w.title || w.cat) + " " + n;
+  }
+  return "聖地めぐり " + n;
+}
+function courseTitleValue(){
+  var t = (document.getElementById("cTitle").value || "").trim();
+  return (t || suggestCourseTitle(draftSteps) || "聖地めぐり").slice(0, 60);
+}
+function updateTitleHint(){
+  var hint = document.getElementById("cTitleHint");
+  if(!hint) return;
+  var typed = (document.getElementById("cTitle").value || "").trim();
+  var sug = suggestCourseTitle(draftSteps);
+  hint.textContent = (!typed && sug) ? "空のままなら「" + sug + "」になります" : "";
+}
+
+function startCourse(ids, autoOrder){
   editingCourse = null;
-  draftSteps = []; draftLegT = []; draftLegM = []; draftStay = [];
+  draftSteps = (ids || []).slice(0, COURSE_MAX);
+  if(autoOrder && draftSteps.length > 2) draftSteps = orderByNearest(draftSteps);
+  draftLegT = []; draftLegM = []; draftStay = [];
+  courseDetail = false;
   document.getElementById("cTitle").value = "";
   document.getElementById("cMemo").value = "";
   document.getElementById("cSearch").value = "";
   renderSteps(); renderPicker();
   openCourseForm();
+}
+/* 「＋ コースを作る」→ まず始め方を選んでもらう */
+function openCourseStart(){
+  var visited = shared.filter(isVisited);
+  var works = workList().filter(function(w){ return w.n >= 2 && w.name !== "作品未設定"; });
+  var h = '<div class="sheet-pad">'
+        + '<div class="sheet-title"><h2>コースを作る</h2>'
+        + '<button class="closeX" id="sClose">×</button></div>'
+        + '<p class="myempty" style="margin-top:10px;">まわる聖地を先に選んでおくと、あとは順番を直すだけです。</p></div>'
+        + '<div style="padding:0 18px 18px;">'
+        + '<button class="startrow" data-start="visited"'+(visited.length < 2 ? " disabled" : "")+'>'
+        + '<div class="ic">👣</div><div class="st"><b>行ったところから作る</b>'
+        + '<span>'+(visited.length < 2
+            ? '訪問済みの聖地が2か所以上になると使えます（いま'+visited.length+'か所）'
+            : '訪問済みの'+visited.length+'か所を、訪問した日の順に並べます')+'</span></div>'
+        + '<div class="ar">›</div></button>'
+        + '<button class="startrow" data-start="work"'+(works.length ? "" : " disabled")+'>'
+        + '<div class="ic">🎬</div><div class="st"><b>作品から作る</b>'
+        + '<span>作品を選ぶと、その聖地をまとめて入れて近い順に並べます</span></div>'
+        + '<div class="ar">›</div></button>'
+        + '<button class="startrow" data-start="blank">'
+        + '<div class="ic">✏️</div><div class="st"><b>自分で選ぶ</b>'
+        + '<span>空の状態から、一覧を見ながら1つずつ足していきます</span></div>'
+        + '<div class="ar">›</div></button>'
+        + '</div>';
+  sheetBody.innerHTML = h;
+  sheetBody.scrollTop = 0;
+  sheet.style.transition = ""; sheet.style.transform = "";
+  sheet.style.display = "flex";
+  sheetMask.style.display = "block"; sheetMask.style.opacity = "";
+  document.getElementById("sClose").onclick = closeSheet;
+  Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-start]"), function(b){
+    if(b.hasAttribute("disabled")) return;
+    b.onclick = function(){
+      var kind = b.dataset.start;
+      if(kind === "visited"){
+        closeSheet();
+        var v = shared.filter(isVisited).sort(function(a,c){
+          return String(visitsOf(a)[0]||"").localeCompare(String(visitsOf(c)[0]||""));
+        });
+        startCourse(v.map(function(s){ return s.id; }), false);
+        toast("訪問した日の順に並べました。順番は変えられます");
+      }else if(kind === "work"){
+        openCourseWorkPick();
+      }else{
+        closeSheet();
+        startCourse([], false);
+      }
+    };
+  });
+}
+/* 作品を選ぶ */
+function openCourseWorkPick(){
+  var works = workList().filter(function(w){ return w.n >= 2 && w.name !== "作品未設定"; });
+  var h = '<div class="sheet-pad">'
+        + '<div class="sheet-title"><h2>作品を選ぶ</h2>'
+        + '<button class="closeX" id="sClose">×</button></div>'
+        + '<p class="myempty" style="margin-top:10px;">聖地が2か所以上ある作品だけを出しています。</p></div>'
+        + '<div style="padding:0 18px 18px;">'
+        + works.map(function(w){
+            var p = splitWork(w.name);
+            return '<button class="startrow" data-w="'+esc(w.name)+'">'
+              + '<div class="st"><b>'+workChipHtml(w.name)+'</b>'
+              + '<span>'+w.n+'か所</span></div><div class="ar">›</div></button>';
+          }).join("")
+        + '</div>';
+  sheetBody.innerHTML = h;
+  sheetBody.scrollTop = 0;
+  document.getElementById("sClose").onclick = closeSheet;
+  Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-w]"), function(b){
+    b.onclick = function(){
+      var name = b.dataset.w;
+      closeSheet();
+      var ids = shared.filter(function(s){ return hasWork(s, name); }).map(function(s){ return s.id; });
+      startCourse(ids, true);
+      toast(ids.length > COURSE_MAX
+        ? "多いので先頭の" + COURSE_MAX + "か所を入れました。近い順に並べています"
+        : "近い順に並べました。順番は変えられます");
+    };
+  });
+}
+document.getElementById("btnNewCourse").addEventListener("click", function(){
+  if(!hasServer()){ toast("オンラインにつながっていません"); return; }
+  if(shared.length < 2){ toast("聖地が2か所以上必要です"); return; }
+  openCourseStart();
 });
+document.getElementById("cSort").addEventListener("click", function(){
+  if(draftSteps.length < 3){ toast("3か所以上でつかえます"); return; }
+  draftSteps = orderByNearest(draftSteps);
+  draftStay = []; draftLegT = []; draftLegM = [];
+  renderSteps(); renderPicker();
+  toast("近い順に並べ替えました");
+});
+document.getElementById("cDetailBtn").addEventListener("click", function(){
+  courseDetail = !courseDetail;
+  renderSteps();
+});
+document.getElementById("cTitle").addEventListener("input", updateTitleHint);
 function openCourseEdit(c){
   editingCourse = c;
   draftSteps = (c.spot_ids || []).slice();
   draftLegT  = (c.leg_transport || []).slice();
   draftLegM  = (c.leg_time || []).slice();
   draftStay  = (c.stay_time || []).slice();
+  courseDetail = draftLegT.concat(draftLegM, draftStay).some(function(v){ return String(v||"").trim(); });
   document.getElementById("cTitle").value = c.title || "";
   document.getElementById("cMemo").value = c.memo || "";
   document.getElementById("cSearch").value = "";
@@ -3701,8 +3892,19 @@ document.getElementById("cCancel").addEventListener("click", function(){
 });
 function renderSteps(){
   var el = document.getElementById("cSteps");
+  var tools = document.getElementById("cTools");
+  if(tools) tools.style.display = draftSteps.length >= 2 ? "flex" : "none";
+  var sortBtn = document.getElementById("cSort");
+  if(sortBtn) sortBtn.style.display = draftSteps.length >= 3 ? "block" : "none";
+  var dBtn = document.getElementById("cDetailBtn");
+  if(dBtn){
+    dBtn.classList.toggle("on", courseDetail);
+    dBtn.textContent = courseDetail ? "移動手段や時間を隠す" : "移動手段や時間も書く";
+  }
+  updateTitleHint();
   if(!draftSteps.length){
     el.innerHTML = '<p class="hint" style="margin:0;">下の一覧から、まわりたい順にタップして追加してください。同じ場所を何度でも入れられます（駅にもどる往復コースなど）</p>';
+    updateDraftTotal();
     return;
   }
   var h = "";
@@ -3710,12 +3912,14 @@ function renderSteps(){
     var s = spotById(id);
     h += '<div class="step"><div class="no">'+(i+1)+'</div>'
       + '<div class="sname"><b>'+esc(s ? s.name : "(不明)")+'</b><span>'+(s ? workLabelHtml(s) : "")+'</span>'
-      + '<input class="stayin" type="text" data-stay="'+i+'" placeholder="滞在時間（例：60分）" maxlength="20" value="'+esc(draftStay[i]||"")+'">'
+      + (courseDetail
+          ? '<input class="stayin" type="text" data-stay="'+i+'" placeholder="滞在時間（例：60分）" maxlength="20" value="'+esc(draftStay[i]||"")+'">'
+          : '')
       + '</div>'
       + '<div class="ops">'
       + '<button data-up="'+i+'">↑</button><button data-down="'+i+'">↓</button><button data-del="'+i+'">×</button>'
       + '</div></div>';
-    if(i < draftSteps.length - 1){
+    if(courseDetail && i < draftSteps.length - 1){
       h += '<div class="leg"><div class="legin">'
         + '<select data-legt="'+i+'"><option value="">移動手段</option>'
         + TRANSPORTS.map(function(t){
@@ -3770,9 +3974,11 @@ function updateDraftTotal(){
   if(!el) return;
   if(draftSteps.length < 2){ el.textContent = ""; return; }
   var t = courseTotal({ spot_ids:draftSteps, stay_time:draftStay, leg_time:draftLegM });
-  el.textContent = t.known
-    ? "所要時間の合計：約" + formatMinutes(t.total) + (t.blank ? "（未入力の欄があります）" : "")
-    : "滞在時間や移動時間を入れると、合計が出ます";
+  if(t.known){
+    el.textContent = "所要時間の合計：約" + formatMinutes(t.total) + (t.blank ? "（未入力の欄があります）" : "");
+  }else{
+    el.textContent = draftSteps.length + "か所。このまま投稿できます";
+  }
 }
 
 function renderPicker(){
@@ -3799,9 +4005,9 @@ function renderPicker(){
 }
 document.getElementById("cSearch").addEventListener("input", renderPicker);
 document.getElementById("cSave").addEventListener("click", function(){
-  var title = (document.getElementById("cTitle").value || "").trim();
-  if(!title){ toast("コース名を入れてください"); return; }
   if(draftSteps.length < 2){ toast("2か所以上えらんでください"); return; }
+  // コース名は空でもよい。空なら土地や作品から自動で付ける
+  var title = courseTitleValue();
 
   // 編集の保存
   if(editingCourse){
@@ -4316,12 +4522,13 @@ document.getElementById("btnOrphans").addEventListener("click", openOrphans);
    ・キーは APP_VERSION と同じ文字列にすること
    ・初めてこのアプリを使う人には出さない（「変わったこと」は意味がないため） */
 var RELEASE_NOTES = {
-  "1.053": {
+  "1.054": {
     title: "聖地の記録が、ひとつになりました",
     items: [
       "「みんなの聖地」と「自分の記録」を1つにまとめました。聖地を開いて大きな「訪問済みにする」を押すだけで記録できます",
       "訪問日・自分だけのメモ・自分だけの写真は、聖地ごとに残せます。これまでどおり他の人には見えません",
       "リストの「まとめて記録」から、まわった聖地をいくつも選んで、いっぺんに訪問済みにできます",
+      "コースが作りやすくなりました。「行ったところから作る」「作品から作る」を選ぶと、聖地と順番が入った状態から始められます",
       "前に付けていた記録は、そのまま引き継いでいます。引き継げなかったものは設定に一覧で出ています",
       "画面を暗くできるようになりました。設定の「画面の明るさ」から選べます"
     ]
