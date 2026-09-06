@@ -596,6 +596,14 @@
   .card .info .b.ba{background:var(--tint);color:var(--tintText);}
   .card .info .b.bc{background:var(--goldTint);color:var(--goldText);margin-left:5px;}
 
+  /* ---------- オフラインの知らせ ---------- */
+  #offlineBar{
+    display:none;margin:2px 14px 8px;padding:9px 12px;border-radius:10px;
+    background:var(--goldTint);color:var(--goldText);font-size:12px;line-height:1.5;
+  }
+  #offlineBar.on{display:block;}
+  body.offline #addBtn{opacity:.45;}
+
   /* ---------- 画面の明るさ ---------- */
   .themerow{display:flex;gap:8px;}
   .themerow button{
@@ -751,6 +759,7 @@
         <div class="stats" id="stats"></div>
         <div class="bar" id="barWrap"><i id="stBar" style="width:0%"></i></div>
       </div>
+      <div id="offlineBar"></div>
       <div class="filters" id="sortRow"></div>
       <div class="filters" id="filters">
         <button class="chip on" data-f="all">すべて</button>
@@ -1008,7 +1017,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.055";
+var APP_VERSION = "1.056";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -1089,7 +1098,11 @@ var draft = null;
 var pickMode = false, pickReturn = null;
 var map = null, markers = {};
 var sharedReady = false;
+var usingCache  = false;   // いま画面に出ているのが端末内の控えか
+var cachedAt    = 0;       // その控えを取った時刻
+var sbFailed    = false;   // 直近の読み込みに失敗したか（書き込みを止める判断に使う）
 var courses = [];          // モデルコース
+var coursesReady = false, profilesReady = false;
 var courseView = null;     // 表示中のコース
 var courseTokens = {};     // 自分が作ったコースの鍵
 
@@ -1352,6 +1365,106 @@ function toast(msg){
 }
 
 /* ================= 共有サーバー ================= */
+/* ================= 端末内の控え（オフライン表示用） =================
+   聖地・コース・プロフィールの取得結果を残しておき、電波が無いときに表示する。
+   localStorage ではなく IndexedDB を使うのは、自分の写真の保存容量（5MB）を
+   食い合わないようにするため。使えない端末では黙って何もしない */
+var CACHE_DB = "seichi-cache", CACHE_STORE = "kv";
+var cacheDb = null, cacheTried = false, cacheWaiting = [];
+function withCacheDb(cb){
+  if(cacheDb || cacheTried){ cb(cacheDb); return; }
+  cacheWaiting.push(cb);
+  if(cacheWaiting.length > 1) return;      // 開いている最中は待つ
+  function done(db){
+    cacheTried = true; cacheDb = db;
+    var q = cacheWaiting; cacheWaiting = [];
+    q.forEach(function(f){ try{ f(db); }catch(e){} });
+  }
+  var req;
+  try{
+    if(typeof indexedDB === "undefined"){ done(null); return; }
+    req = indexedDB.open(CACHE_DB, 1);
+  }catch(e){ done(null); return; }
+  req.onupgradeneeded = function(){
+    var db = req.result;
+    if(!db.objectStoreNames.contains(CACHE_STORE)) db.createObjectStore(CACHE_STORE);
+  };
+  req.onsuccess = function(){ done(req.result); };
+  req.onerror   = function(){ done(null); };
+  req.onblocked = function(){ done(null); };
+}
+function cacheGet(key, cb){
+  withCacheDb(function(db){
+    if(!db){ cb(null); return; }
+    try{
+      var r = db.transaction(CACHE_STORE, "readonly").objectStore(CACHE_STORE).get(key);
+      r.onsuccess = function(){ cb(r.result || null); };
+      r.onerror   = function(){ cb(null); };
+    }catch(e){ cb(null); }
+  });
+}
+function cacheSet(key, rows){
+  withCacheDb(function(db){
+    if(!db) return;
+    try{
+      db.transaction(CACHE_STORE, "readwrite").objectStore(CACHE_STORE)
+        .put({ at: Date.now(), rows: rows }, key);
+    }catch(e){}
+  });
+}
+/* 控えをいつ取ったかの表示（「今日 14:20」「9月3日 14:20」） */
+function cachedLabel(){
+  if(!cachedAt) return "前回";
+  var d = new Date(cachedAt), now = new Date();
+  var hm = ("0"+d.getHours()).slice(-2) + ":" + ("0"+d.getMinutes()).slice(-2);
+  return d.toDateString() === now.toDateString()
+    ? "今日 " + hm
+    : (d.getMonth()+1) + "月" + d.getDate() + "日 " + hm;
+}
+/* 起動直後にすぐ控えを出す。サーバーから取れていたら何もしない */
+function showCached(){
+  cacheGet("spots", function(rec){
+    if(sharedReady || !rec || !rec.rows || !rec.rows.length) return;
+    shared = rec.rows;
+    cachedAt = rec.at || 0;
+    usingCache = true;
+    updateServerState();
+    renderMarkers(); renderList(); updateWorkBtn();
+  });
+  cacheGet("courses", function(rec){
+    if(coursesReady || !rec || !rec.rows) return;
+    courses = rec.rows;
+    renderCourseList();
+  });
+  cacheGet("profiles", function(rec){
+    if(profilesReady || !rec || !rec.rows) return;
+    profiles = {};
+    rec.rows.forEach(function(p){ if(p && p.user_id) profiles[p.user_id] = p; });
+    renderList();
+  });
+}
+/* いまオフラインか（＝サーバーに書き込めない状態か） */
+function isOffline(){ return hasServer() && (sbFailed || navigator.onLine === false); }
+function updateOfflineUI(){
+  if(document.body) document.body.classList.toggle("offline", isOffline());
+  var bar = document.getElementById("offlineBar");
+  if(!bar) return;
+  if(usingCache && !sharedReady){
+    bar.textContent = "電波がつながっていません。" + cachedLabel()
+      + "に読み込んだ内容を表示しています。訪問チェックはこのまま記録できます。";
+    bar.className = "on";
+  }else{
+    bar.className = "";
+  }
+}
+/* サーバーに届ける必要がある操作の手前で呼ぶ。
+   起動直後でまだ返事が無いだけのときは通す（誤って止めないため） */
+function needOnline(what){
+  if(!isOffline()) return true;
+  toast("電波がつながっていないため、" + what + "は保存できません");
+  return false;
+}
+
 function sbBase(){
   // 末尾の "/" や "/rest/v1" を貼り付けてしまっても動くようにする
   return String(SUPABASE_URL).replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
@@ -1376,11 +1489,15 @@ function sbLoad(cb){
         return typeof r.lat === "number" && typeof r.lng === "number";
       });
       sharedReady = true;
+      usingCache = false; sbFailed = false; cachedAt = 0;
+      cacheSet("spots", shared);
+      markSeen();                 // 新着の基準は、読み込めたときだけ進める
       updateServerState();
       if(cb) cb(true);
     })
     .catch(function(){
       sharedReady = false;
+      sbFailed = true;
       updateServerState();
       if(cb) cb(false);
     });
@@ -1431,10 +1548,12 @@ function sbUploadAll(list, cb){
 function sbLoadProfiles(cb){
   if(!hasServer()){ if(cb) cb(); return; }
   fetch(sbBase() + "/rest/v1/profiles?select=user_id,name,icon&limit=1000", { headers: sbHeaders() })
-    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
     .then(function(rows){
       profiles = {};
       (rows || []).forEach(function(p){ if(p && p.user_id) profiles[p.user_id] = p; });
+      profilesReady = true;
+      cacheSet("profiles", rows || []);
       if(cb) cb();
     })
     .catch(function(){ if(cb) cb(); });
@@ -1561,10 +1680,17 @@ function sbDelete(id, token, cb){
 function updateServerState(){
   var el = document.getElementById("sbState");
   if(!el) return;
-  if(!hasServer()){ el.innerHTML = '<span class="dot ng"></span>設定されていません'; return; }
-  el.innerHTML = sharedReady
-    ? '<span class="dot ok"></span>つながっています（聖地 ' + shared.length + '件）'
-    : '<span class="dot ng"></span>つながっていません';
+  if(!hasServer()){
+    el.innerHTML = '<span class="dot ng"></span>設定されていません';
+  }else if(sharedReady){
+    el.innerHTML = '<span class="dot ok"></span>つながっています（聖地 ' + shared.length + '件）';
+  }else if(usingCache){
+    el.innerHTML = '<span class="dot ng"></span>つながっていません（'
+      + cachedLabel() + 'の控えを表示中・聖地 ' + shared.length + '件）';
+  }else{
+    el.innerHTML = '<span class="dot ng"></span>つながっていません';
+  }
+  updateOfflineUI();
 }
 
 /* ================= 地図 ================= */
@@ -1640,7 +1766,9 @@ function canEditShared(id){ return !!(myTokens[id] || adminKey); }
 /* 前回このアプリを開いた時刻。これより後に登録されたものに NEW を付ける */
 var KEY_SEEN = "conan-seichi-lastseen";
 var prevSeen = Number(localStorage.getItem(KEY_SEEN) || 0);
-try{ localStorage.setItem(KEY_SEEN, String(Date.now())); }catch(e){}
+/* 「ここまで見た」の記録は、サーバーから読めたときだけ進める。
+   圏外で起動しただけで基準が進むと、次に開いたとき新着が出なくなる */
+function markSeen(){ try{ localStorage.setItem(KEY_SEEN, String(Date.now())); }catch(e){} }
 function isNew(row){
   if(!prevSeen || !row || !row.created_at) return false;
   var t = Date.parse(row.created_at);
@@ -2294,6 +2422,7 @@ function setupComments(s){
   send.onclick = function(){
     var body = (input.value || "").trim();
     if(!body){ toast("コメントを入力してください"); return; }
+    if(!needOnline("コメント")) return;
     if(!nickname){
       var n = prompt("表示される名前を入力してください", "");
       if(n === null) return;
@@ -2334,6 +2463,7 @@ sharedPhotoInput.addEventListener("change", function(e){
   var files = Array.prototype.slice.call(e.target.files || []);
   e.target.value = "";
   if(!s || !files.length) return;
+  if(!needOnline("みんなの写真")) return;
   var have = (s.photos || []).slice();
   files = files.slice(0, SHARED_PHOTO_MAX - have.length);
   if(!files.length){ toast("写真は"+SHARED_PHOTO_MAX+"枚までです"); return; }
@@ -2783,6 +2913,7 @@ if(window.visualViewport){
   });
 }
 document.getElementById("addBtn").addEventListener("click", function(){
+  if(!needOnline("聖地の登録")) return;
   draft = null; editingId = null;
   startPick("new");
 });
@@ -3474,8 +3605,13 @@ function sbLoadCourses(cb){
   if(!hasServer()){ if(cb) cb(); return; }
   fetch(sbBase() + "/rest/v1/courses?select=id,created_at,title,memo,spot_ids,author,author_id,leg_transport,leg_time,stay_time"
         + "&order=created_at.desc&limit=200", { headers: sbHeaders() })
-    .then(function(r){ return r.ok ? r.json() : []; })
-    .then(function(rows){ courses = rows || []; if(cb) cb(); })
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(rows){
+      courses = rows || [];
+      coursesReady = true;
+      cacheSet("courses", courses);
+      if(cb) cb();
+    })
     .catch(function(){ if(cb) cb(); });
 }
 function sbAddCourse(row, cb){
@@ -3516,7 +3652,9 @@ function renderCourseList(){
   if(!el) return;
   if(!hasServer()){ el.innerHTML = '<div class="empty">オンラインにつながっていません</div>'; return; }
   if(!courses.length){
-    el.innerHTML = '<div class="empty"><div class="big">🚩</div>まだコースがありません<br>上のボタンから作ってみてください</div>';
+    el.innerHTML = isOffline()
+      ? '<div class="empty"><div class="big">📡</div>電波がつながっていません<br>コースは一度読み込むと、圏外でも見られます</div>'
+      : '<div class="empty"><div class="big">🚩</div>まだコースがありません<br>上のボタンから作ってみてください</div>';
     return;
   }
   el.innerHTML = courses.map(function(c){
@@ -4006,6 +4144,7 @@ function renderPicker(){
 document.getElementById("cSearch").addEventListener("input", renderPicker);
 document.getElementById("cSave").addEventListener("click", function(){
   if(draftSteps.length < 2){ toast("2か所以上えらんでください"); return; }
+  if(!needOnline("コース")) return;
   // コース名は空でもよい。空なら土地や作品から自動で付ける
   var title = courseTitleValue();
 
@@ -4522,15 +4661,13 @@ document.getElementById("btnOrphans").addEventListener("click", openOrphans);
    ・キーは APP_VERSION と同じ文字列にすること
    ・初めてこのアプリを使う人には出さない（「変わったこと」は意味がないため） */
 var RELEASE_NOTES = {
-  "1.054": {
-    title: "聖地の記録が、ひとつになりました",
+  "1.056": {
+    title: "電波がなくても、聖地が見られます",
     items: [
-      "「みんなの聖地」と「自分の記録」を1つにまとめました。聖地を開いて大きな「訪問済みにする」を押すだけで記録できます",
-      "訪問日・自分だけのメモ・自分だけの写真は、聖地ごとに残せます。これまでどおり他の人には見えません",
-      "リストの「まとめて記録」から、まわった聖地をいくつも選んで、いっぺんに訪問済みにできます",
-      "コースが作りやすくなりました。「行ったところから作る」「作品から作る」を選ぶと、聖地と順番が入った状態から始められます",
-      "前に付けていた記録は、そのまま引き継いでいます。引き継げなかったものは設定に一覧で出ています",
-      "画面を暗くできるようになりました。設定の「画面の明るさ」から選べます"
+      "一度読み込んだ聖地とコースを端末の中に控えるようにしました。圏外や電波の弱い場所でも、リストと訪問記録がそのまま見られます",
+      "圏外のときは、いつ読み込んだ内容かをリストの上に表示します。電波が戻ると自動で最新に更新されます",
+      "圏外では、聖地の登録・コメント・みんなの写真の投稿はできません（押すとお知らせが出ます）。訪問チェックはこれまでどおり記録できます",
+      "地図そのものは電波が必要です。圏外では表示されないことがあります"
     ]
   }
 };
@@ -4573,11 +4710,16 @@ function syncVisitsOnce(){
   if(!hasServer()) return;
   if(localStorage.getItem(KEY_VISITSYNC) === "1") return;
   var list = Object.keys(myLog).filter(function(k){ return myLog[k].visits.length > 0; });
-  try{ localStorage.setItem(KEY_VISITSYNC, "1"); }catch(e){}
-  if(!list.length) return;
-  var i = 0;
-  (function next(){
-    if(i >= list.length){ renderList(); return; }
+  function markDone(){ try{ localStorage.setItem(KEY_VISITSYNC, "1"); }catch(e){} }
+  if(!list.length){ markDone(); return; }
+  var i = 0, failed = false;
+  (function next(res){
+    if(typeof res === "number" && res < 0) failed = true;
+    if(i >= list.length){
+      // 圏外などで送れなかったときは印を付けず、次に開いたときにもう一度試す
+      if(!failed) markDone();
+      renderList(); return;
+    }
     sbSetAdded(list[i++], true, next);
   })();
 }
@@ -4599,6 +4741,7 @@ renderMarkers();
 renderList();
 updateFilterBar();
 updateServerState();
+showCached();          // 前回の控えをすぐ表示（サーバーから取れたら上書きされる）
 if(hasServer()){
   sbTouchVisitor();
   sbLoadProfiles(function(){ closeSheet(); renderList(); renderCourseList(); });
@@ -4613,6 +4756,19 @@ if(hasServer()){
 }
 
 window.addEventListener("resize", function(){ if(map) map.resize(); });
+
+/* 電波が戻ったら、その場で最新を読み直す */
+window.addEventListener("online", function(){
+  if(!hasServer() || sharedReady) return;
+  sbLoad(function(ok){
+    if(!ok) return;
+    renderMarkers(); renderList(); renderCourseList(); updateWorkBtn();
+    toast("最新の聖地を読み込みました");
+  });
+  sbLoadCourses(renderCourseList);
+  sbLoadProfiles(function(){ renderList(); });
+});
+window.addEventListener("offline", function(){ sbFailed = true; updateServerState(); });
 
 /* ================= 自動更新チェック =================
    サーバー上のファイルを毎回キャッシュ無視で読み、
