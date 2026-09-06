@@ -1008,7 +1008,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.054";
+var APP_VERSION = "1.055";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -2435,7 +2435,7 @@ searchInput.addEventListener("input", function(){
   if(hits.length){
     h += '<div class="s-head">聖地</div>';
     h += hits.map(function(s){
-      return '<div class="s-item" data-id="'+esc(s.id)+'><b>'+esc(s.name)+'</b><span>'+workLabelHtml(s)+'</span></div>';
+      return '<div class="s-item" data-id="'+esc(s.id)+'"><b>'+esc(s.name)+'</b><span>'+workLabelHtml(s)+'</span></div>';
     }).join("");
   }
   h += '<div class="s-head" id="geoHead">地名で探す…</div>';
