@@ -7,11 +7,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#1b2a49">
 <meta name="apple-mobile-web-app-title" content="聖地巡礼">
+<meta name="description" content="アニメ・マンガの聖地を地図で探して、訪問を記録できる無料のWebアプリ。みんなで聖地を登録・共有し、モデルコースも作れます。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="聖地巡礼マップ">
+<meta property="og:description" content="聖地を地図で探して、訪問を記録。みんなで作る聖地巡礼マップ。">
+<meta property="og:url" content="https://junrei-log.github.io/seichi/">
+<meta property="og:image" content="https://junrei-log.github.io/seichi/icon-512.png">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" href="icon-512.png">
+<link rel="icon" href="icon-192.png">
 <title>聖地巡礼マップ</title>
-<link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet">
-<link href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet"
+      onerror="this.onerror=null;this.href='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css'">
 <script>
 /* 画面が出る前に配色を決める（切り替わるときの白いちらつきを防ぐ） */
 (function(){
@@ -596,6 +605,57 @@
   .card .info .b.ba{background:var(--tint);color:var(--tintText);}
   .card .info .b.bc{background:var(--goldTint);color:var(--goldText);margin-left:5px;}
 
+  /* ---------- ホーム ---------- */
+  #homePage{overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--fill);}
+  #hero{
+    position:relative;min-height:238px;display:flex;align-items:flex-end;overflow:hidden;
+    background:linear-gradient(155deg,#2a3f6b,var(--navy));
+  }
+  html[data-theme="dark"] #hero{background:linear-gradient(155deg,#2b3c63,#12161f);}
+  #heroPhoto{position:absolute;inset:0;background-size:cover;background-position:center;}
+  #hero .scrim{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(10,16,30,.55) 0%,rgba(10,16,30,.18) 42%,rgba(10,16,30,.72) 100%);
+  }
+  .hero-top{
+    position:absolute;left:18px;top:calc(14px + var(--safe-t));z-index:2;
+    display:flex;align-items:center;gap:6px;color:#fff;font-size:13.5px;font-weight:800;
+    text-shadow:0 1px 6px rgba(0,0,0,.5);
+  }
+  .hero-top svg{width:15px;height:15px;}
+  .hero-body{position:relative;z-index:2;padding:0 20px 22px;}
+  .hero-body h1{
+    margin:0;color:#fff;font-size:25px;line-height:1.5;font-weight:800;letter-spacing:.03em;
+    text-shadow:0 2px 12px rgba(0,0,0,.55);
+  }
+
+  .hsec{padding:0 14px;margin-top:14px;}
+  .hsec:last-child{padding-bottom:calc(22px + var(--safe-b));}
+  .hcard{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 1px 4px var(--sh);}
+  .hcard > h3{margin:0 0 12px;font-size:15.5px;font-weight:800;}
+  .hstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .hstat{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:12px 11px;}
+  .hstat .ic{
+    flex:none;width:34px;height:34px;border-radius:10px;background:var(--tint);
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .hstat .tx{min-width:0;}
+  .hstat .tx span{display:block;font-size:11px;color:var(--sub);font-weight:700;line-height:1.3;}
+  .hstat .tx b{display:block;font-size:20px;font-weight:800;line-height:1.25;}
+  .hstat .tx b i{font-style:normal;font-size:11px;font-weight:700;color:var(--sub);margin-left:3px;}
+
+  .hhead{display:flex;align-items:center;gap:10px;margin:0 4px 9px;}
+  .hhead h3{flex:1;min-width:0;margin:0;font-size:15.5px;font-weight:800;}
+  .hmore{flex:none;font-size:12px;font-weight:700;color:var(--red);white-space:nowrap;}
+  .hempty{
+    background:var(--card);border-radius:14px;padding:22px 16px;text-align:center;
+    color:var(--sub);font-size:12.5px;line-height:1.7;box-shadow:0 1px 4px var(--sh);
+  }
+  .hempty .big{font-size:26px;margin-bottom:6px;}
+  .hcourse{background:var(--card);border-radius:14px;padding:13px 14px;margin-bottom:8px;box-shadow:0 1px 4px var(--sh);}
+  .hcourse h4{margin:0;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hcourse .cmeta{font-size:11.5px;color:var(--sub);margin-top:4px;display:flex;align-items:center;gap:6px;}
+
   /* ---------- オフラインの知らせ ---------- */
   #offlineBar{
     display:none;margin:2px 14px 8px;padding:9px 12px;border-radius:10px;
@@ -636,6 +696,66 @@
     width:100%;margin-top:6px;padding:15px;border-radius:14px;
     background:var(--navy);color:#fff;font-size:15px;font-weight:800;
   }
+  /* ---------- 通報・同意などの小さな窓 ---------- */
+  #dlgMask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2600;display:none;}
+  #dlgBox{
+    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2601;display:none;
+    width:min(420px, calc(100% - 32px));max-height:86vh;overflow-y:auto;
+    background:var(--card);border-radius:20px;padding:20px 18px 16px;box-shadow:0 12px 40px var(--sh2);
+  }
+  #dlgBox h3{margin:0 0 6px;font-size:18px;font-weight:800;line-height:1.4;}
+  #dlgBox .dsub{margin:0 0 14px;font-size:12.5px;color:var(--sub);line-height:1.7;}
+  #dlgBox ul.rules{margin:0 0 14px;padding:0;list-style:none;}
+  #dlgBox ul.rules li{position:relative;padding-left:20px;margin-bottom:9px;font-size:13.5px;line-height:1.7;color:var(--text2);}
+  #dlgBox ul.rules li::before{content:"";position:absolute;left:4px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--red);}
+  .rsn{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
+  .rsn button{
+    text-align:left;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);
+    background:var(--soft);font-size:14px;font-weight:600;color:var(--text2);
+  }
+  .rsn button.on{border-color:var(--red);background:var(--redTint);color:var(--red);}
+  #dlgBox textarea{
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--soft);
+    outline:none;min-height:90px;line-height:1.6;resize:vertical;
+  }
+  #dlgBox textarea:focus{border-color:var(--navy);background:var(--card);}
+  .dlg-row{display:flex;gap:8px;margin-top:14px;}
+  .dlg-row button{flex:1;padding:14px;border-radius:14px;font-size:15px;font-weight:800;}
+  .dlg-row .dno{background:var(--fill);color:var(--text2);}
+  .dlg-row .dyes{background:var(--navy);color:#fff;}
+  .dlg-row .dyes:disabled{background:var(--fill);color:var(--faint);}
+  .dlg-link{display:block;margin:4px auto 0;font-size:12.5px;font-weight:700;color:var(--navy);padding:6px;}
+  html[data-theme="dark"] .dlg-link{color:var(--tintText);}
+  .report-link{
+    display:block;margin:18px auto 0;padding:8px 12px;font-size:12px;color:var(--sub);font-weight:600;
+  }
+  .cmt .cmt-rep{
+    background:none;width:auto;height:auto;border-radius:0;font-size:11px;color:var(--faint);padding:0;margin-left:auto;
+  }
+
+  /* ---------- 規約などの文書 ---------- */
+  #docPage{position:fixed;inset:0;z-index:2400;background:var(--card);display:none;flex-direction:column;}
+  .doc-body{flex:1;overflow-y:auto;padding:18px 20px calc(40px + var(--safe-b));font-size:14px;line-height:1.9;color:var(--text2);}
+  .doc-body h2{margin:26px 0 8px;font-size:16px;font-weight:800;color:var(--text);}
+  .doc-body h2:first-child{margin-top:4px;}
+  .doc-body ol,.doc-body ul{padding-left:1.4em;margin:6px 0;}
+  .doc-body li{margin-bottom:4px;}
+  .doc-body .dated{font-size:12px;color:var(--sub);margin-top:28px;}
+  .doc-tabs{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);flex:none;overflow-x:auto;}
+  .doc-tabs button{flex:none;padding:8px 14px;border-radius:999px;background:var(--fill);font-size:13px;font-weight:700;color:var(--text2);}
+  .doc-tabs button.on{background:var(--navy);color:#fff;}
+
+  /* ---------- 届いた通報（管理者） ---------- */
+  .rep-row{padding:12px 0;border-bottom:1px solid var(--line);}
+  .rep-row .rh{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--sub);}
+  .rep-row .rk{background:var(--redTint);color:var(--red);border-radius:999px;padding:2px 9px;font-weight:800;font-size:11px;}
+  .rep-row .rk.fb{background:var(--tint);color:var(--tintText);}
+  .rep-row b{display:block;font-size:14px;margin-top:5px;}
+  .rep-row p{margin:3px 0 0;font-size:13px;white-space:pre-wrap;word-break:break-word;color:var(--text2);}
+  .rep-row .ra{display:flex;gap:8px;margin-top:8px;}
+  .rep-row .ra button{padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;background:var(--fill);border:1px solid var(--line);}
+  .rep-row.done{opacity:.5;}
+
   .empty{text-align:center;padding:56px 30px;color:var(--sub);font-size:14px;line-height:1.9;}
   .empty .big{font-size:40px;margin-bottom:10px;}
 
@@ -696,8 +816,46 @@
 <div id="app">
   <div id="main">
 
+    <!-- ===== ホーム ===== -->
+    <div class="page active" id="homePage">
+      <div id="hero">
+        <div id="heroPhoto"></div>
+        <div class="scrim"></div>
+        <div class="hero-top">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+          聖地巡礼マップ
+        </div>
+        <div class="hero-body">
+          <h1>聖地を巡る。<br>記録する。<br>思い出す。</h1>
+        </div>
+      </div>
+
+      <div class="hsec">
+        <div class="hcard">
+          <h3>あなたの巡礼記録</h3>
+          <div class="hstats" id="homeStats"></div>
+        </div>
+      </div>
+
+      <div class="hsec">
+        <div class="hhead">
+          <h3>最近の訪問</h3>
+          <button class="hmore" data-go="listPage">一覧を見る</button>
+        </div>
+        <div id="homeRecent"></div>
+      </div>
+
+      <div class="hsec">
+        <div class="hhead">
+          <h3>みんなのコース</h3>
+          <button class="hmore" data-go="coursePage">一覧を見る</button>
+        </div>
+        <div id="homeCourses"></div>
+      </div>
+    </div>
+
     <!-- ===== マップ ===== -->
-    <div class="page active" id="mapPage">
+    <div class="page" id="mapPage">
       <div id="map"></div>
 
       <div id="searchWrap">
@@ -866,6 +1024,9 @@
         <div class="set-item admin-only" id="btnStats" style="display:none;">
           <div><div>利用状況</div><small id="statsState">使っている人の数などを見る</small></div><div class="go">見る</div>
         </div>
+        <div class="set-item admin-only" id="btnReports" style="display:none;">
+          <div><div>届いた通報・お問い合わせ</div><small id="reportsState">未対応のものを見る</small></div><div class="go">見る</div>
+        </div>
         <div class="set-item admin-only" id="btnMergeWork" style="display:none;">
           <div><div>作品名をまとめる</div><small>表記ゆれを1つに統一します</small></div><div class="go">整理</div>
         </div>
@@ -885,6 +1046,14 @@
         </div>
         <div class="set-item" id="btnOrphans" style="display:none;">
           <div><div>引き継げなかった記録</div><small id="orphanState">-</small></div><div class="go">確認</div>
+        </div>
+      </div>
+      <div class="set-sec">
+        <div class="set-item" id="btnTerms">
+          <div><div>利用規約とプライバシー</div><small>投稿のルール・集めている情報・お問い合わせ先</small></div><div class="go">読む</div>
+        </div>
+        <div class="set-item" id="btnFeedback">
+          <div><div>ご意見・不具合の報告</div><small>運営者に直接届きます。返信はできません</small></div><div class="go">送る</div>
         </div>
       </div>
       <div class="set-sec">
@@ -970,7 +1139,11 @@
   </div>
 
   <div id="nav">
-    <button data-p="mapPage" class="on">
+    <button data-p="homePage" class="on">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3.5l9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.5 20v-5.5h5V20"/></svg>
+      <span>ホーム</span>
+    </button>
+    <button data-p="mapPage">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 3L3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3z"/><path d="M9 3v15M15 6v15"/></svg>
       <span>マップ</span>
     </button>
@@ -997,6 +1170,23 @@
   <button id="noteOk">はじめる</button>
 </div>
 
+<div id="dlgMask"></div>
+<div id="dlgBox" role="dialog" aria-modal="true"></div>
+
+<div id="docPage">
+  <div class="topbar">
+    <span style="width:56px;"></span>
+    <h3>利用規約とプライバシー</h3>
+    <button id="docClose" style="width:56px;text-align:right;">閉じる</button>
+  </div>
+  <div class="doc-tabs" id="docTabs">
+    <button data-doc="terms">利用規約</button>
+    <button data-doc="privacy">プライバシー</button>
+    <button data-doc="rules">投稿のルール</button>
+  </div>
+  <div class="doc-body" id="docBody"></div>
+</div>
+
 <div id="lightbox">
   <div id="lbTrack"></div>
   <div id="lbCount"></div>
@@ -1009,15 +1199,16 @@
 <input type="file" id="restoreAllInput" accept="application/json,.json" hidden>
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5/dist/maplibre-gl.js"></script>
-<script>window.maplibregl || document.write('<scr'+'ipt src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"><\/scr'+'ipt>');</script>
+<!-- 版を固定する（「@5」のままだと、ライブラリ側の更新で突然表示が崩れることがある） -->
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+<script>window.maplibregl || document.write('<scr'+'ipt src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"><\/scr'+'ipt>');</script>
 <script>
 /* ============================================================
    共有サーバー（Supabase）の設定
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.056";
+var APP_VERSION = "1.058";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -1332,7 +1523,11 @@ function oldVisits(p){
   return uniqSorted(v);
 }
 function visitLabel(i){ return i === 0 ? "初回" : (i+1) + "回目"; }
-function today(){ return new Date().toISOString().slice(0,10); }
+/* 端末の時刻での日付。toISOString は世界標準時なので、日本だと朝9時前に前日の日付になってしまう */
+function ymd(d){
+  return d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2);
+}
+function today(){ return ymd(new Date()); }
 function fmtDate(d){ return String(d||"").replace(/-/g, "/"); }
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
@@ -1600,8 +1795,8 @@ function sbAddComment(spotId, body, token, cb){
         { method:"POST", headers: sbHeaders({ "Prefer":"return=minimal" }),
           body: JSON.stringify({ spot_id:spotId, user_id:myUid, name:(nickname||"名無し").slice(0,40),
                                  body:body.slice(0,500), edit_token:token }) })
-    .then(function(r){ cb(r.ok); })
-    .catch(function(){ cb(false); });
+    .then(function(r){ cb(r.ok, r.status); })
+    .catch(function(){ cb(false, 0); });
 }
 function sbDeleteComment(id, token, cb){
   fetch(sbBase() + "/rest/v1/rpc/delete_comment",
@@ -1725,6 +1920,7 @@ function fitJapan(){
   try{ map.fitBounds(JAPAN_BOUNDS, { padding: 24, duration: 0 }); }catch(e){}
 }
 function fitAll(){
+  mapFitPending = false;
   var list = currentList();
   if(!map || !list.length) return;
 
@@ -1840,7 +2036,7 @@ function timeAgo(iso){
   if(d < 3600) return Math.floor(d/60) + "分前";
   if(d < 86400) return Math.floor(d/3600) + "時間前";
   if(d < 2592000) return Math.floor(d/86400) + "日前";
-  return new Date(t).toISOString().slice(0,10).replace(/-/g,"/");
+  return ymd(new Date(t)).replace(/-/g,"/");
 }
 /* 写真を消せるのは「自分が入れた写真」と「管理キーを持つ人」だけ。
    ピンの登録者でも、他人が入れた写真は消せない */
@@ -2003,20 +2199,27 @@ function drawCourseLine(list){
       paint:{ "line-color":"#d7263d", "line-width":3.5, "line-opacity":0.85, "line-dasharray":[2,1.4] } });
   }catch(e){}
 }
+var mapFitPending = true;   // 地図をまだ一度も表示していない
 function flyTo(lat, lng, zoom){
+  mapFitPending = false;
   if(!map) return;
   map.easeTo({ center:[lng, lat], zoom: Math.max(map.getZoom(), zoom||15), duration:600 });
 }
 
 /* ================= 画面切り替え ================= */
-var PAGES = ["mapPage","listPage","coursePage","setPage"];
+var PAGES = ["homePage","mapPage","listPage","coursePage","setPage"];
 function showPage(id){
   if(id !== "listPage" && selectMode) setSelectMode(false);
   PAGES.forEach(function(p){ document.getElementById(p).classList.toggle("active", p===id); });
   Array.prototype.forEach.call(document.querySelectorAll("#nav button"), function(b){
     b.classList.toggle("on", b.dataset.p===id);
   });
-  if(id==="mapPage" && map) setTimeout(function(){ map.resize(); }, 60);
+  if(id==="mapPage" && map) setTimeout(function(){
+    map.resize();
+    // 最初はホームが出ているので、地図は表示された時点で日本全体に合わせ直す
+    if(mapFitPending){ mapFitPending = false; fitJapan(); }
+  }, 60);
+  if(id==="homePage") renderHome();
   if(id==="listPage"){ renderSortRow(); renderList(); }
   if(id==="coursePage") renderCourseList();
   if(id==="setPage") updateServerState();
@@ -2146,7 +2349,8 @@ function openSheet(id){
      + '<div class="cmt-form">'
      + '<textarea id="cmtInput" placeholder="この場所の情報や感想を書く" maxlength="500"></textarea>'
      + '<button id="cmtSend">送信</button>'
-     + '</div></div>';
+     + '</div></div>'
+     + '<button class="report-link" id="sReport">この聖地の問題を報告する</button>';
 
   sheetBody.innerHTML = h;
   sheetBody.scrollTop = 0;
@@ -2215,7 +2419,9 @@ function openSheet(id){
 
   // 共有ピンの写真を追加・削除
   var addPh = document.getElementById("sAddPhoto");
-  if(addPh) addPh.onclick = function(){ photoTarget = s; sharedPhotoInput.click(); };
+  if(addPh) addPh.onclick = function(){
+    needAgree(function(){ photoTarget = s; sharedPhotoInput.click(); });
+  };
   Array.prototype.forEach.call(sheetBody.querySelectorAll(".thumbs img[data-lb]"), function(im){
     im.onclick = function(){ openLightbox(photos, +im.dataset.lb); };
   });
@@ -2261,6 +2467,10 @@ function openSheet(id){
   document.getElementById("sMyEdit").onclick = function(){ closeSheet(); openLogForm(s); };
 
   setupComments(s);
+  document.getElementById("sReport").onclick = function(){
+    openReport({ kind:"spot", target:String(s.id), spot:s.id, name:s.name,
+                 photo: photos.length ? photos[photoIndex] || photos[0] : "" });
+  };
 
   if(document.getElementById("mapPage").classList.contains("active")) flyTo(s.lat, s.lng, 15);
 }
@@ -2391,11 +2601,17 @@ function renderComments(list){
     return '<div class="cmt" data-cid="'+esc(c.id)+'">'
       + avatarHtml(c.user_id, c.name)
       + '<div class="cmt-body"><div class="cmt-head"><b>'+esc(displayName(c.user_id, c.name))+'</b>'
-      + '<span>'+esc(timeAgo(c.created_at))+'</span></div>'
+      + '<span>'+esc(timeAgo(c.created_at))+'</span>'
+      + '<button class="cmt-rep" data-rep="'+esc(c.id)+'">報告</button></div>'
       + '<p>'+esc(c.body)+'</p></div>'
       + (mine ? '<button data-del="'+esc(c.id)+'">×</button>' : '')
       + '</div>';
   }).join("");
+  Array.prototype.forEach.call(el.querySelectorAll("button[data-rep]"), function(b){
+    b.onclick = function(){
+      openReport({ kind:"comment", target:b.dataset.rep, spot:commentSpotId, name:"このコメント" });
+    };
+  });
   Array.prototype.forEach.call(el.querySelectorAll("button[data-del]"), function(b){
     b.onclick = function(){
       var cid = b.dataset.del;
@@ -2423,6 +2639,7 @@ function setupComments(s){
     var body = (input.value || "").trim();
     if(!body){ toast("コメントを入力してください"); return; }
     if(!needOnline("コメント")) return;
+    if(!hasAgreed()){ needAgree(function(){ send.click(); }); return; }
     if(!nickname){
       var n = prompt("表示される名前を入力してください", "");
       if(n === null) return;
@@ -2433,9 +2650,9 @@ function setupComments(s){
     }
     send.textContent = "送信中…";
     var token = randToken();
-    sbAddComment(s.id, body, token, function(ok){
+    sbAddComment(s.id, body, token, function(ok, status){
       send.textContent = "送信";
-      if(!ok){ toast("送信できませんでした"); return; }
+      if(!ok){ toast(status === 429 ? RATE_MSG : "送信できませんでした"); return; }
       input.value = "";
       sbLoadComments(s.id, renderComments);
       toast("コメントを投稿しました");
@@ -2552,11 +2769,9 @@ function askNickname(cb){
 /* ================= 検索 ================= */
 var searchInput = document.getElementById("searchInput");
 var suggest = document.getElementById("suggest");
-var geoTimer = null;
 
 searchInput.addEventListener("input", function(){
   var q = searchInput.value.trim();
-  clearTimeout(geoTimer);
   if(!q){ suggest.style.display="none"; return; }
   var hits = currentList().filter(function(s){
     return (s.name+" "+worksOf(s).join(" ")+" "+(s.addr||"")+" "+(s.memo||"")).toLowerCase().indexOf(q.toLowerCase()) >= 0;
@@ -2568,25 +2783,34 @@ searchInput.addEventListener("input", function(){
       return '<div class="s-item" data-id="'+esc(s.id)+'"><b>'+esc(s.name)+'</b><span>'+workLabelHtml(s)+'</span></div>';
     }).join("");
   }
-  h += '<div class="s-head" id="geoHead">地名で探す…</div>';
+  // 地名検索（Nominatim）は入力のたびに呼ぶと利用規約違反になるので、押したときだけ探す
+  h += '<div class="s-item s-geo" id="geoHead"><b>「'+esc(q)+'」を地名で探す</b><span>住所・駅名・施設名など</span></div>';
   suggest.innerHTML = h;
   suggest.style.display = "block";
-  geoTimer = setTimeout(function(){
-    nominatim(q, function(list){
-      if(searchInput.value.trim() !== q) return;
-      var head = document.getElementById("geoHead");
-      if(!head) return;
-      if(!list){ head.textContent = "地名検索に接続できませんでした"; return; }
-      if(!list.length){ head.textContent = "地名の候補は見つかりませんでした"; return; }
-      head.textContent = "地名で探す";
-      head.insertAdjacentHTML("afterend", list.map(function(p){
-        var nm = (p.display_name||"").split(",")[0];
-        return '<div class="s-item" data-lat="'+p.lat+'" data-lng="'+p.lon+'"><b>'+esc(nm)+'</b><span>'+esc(p.display_name||"")+'</span></div>';
-      }).join(""));
-    });
-  }, 700);
+});
+function geoSearchTop(){
+  var q = searchInput.value.trim();
+  var head = document.getElementById("geoHead");
+  if(!q || !head) return;
+  head.className = "s-head";
+  head.removeAttribute("id");
+  head.textContent = "地名を探しています…";
+  nominatim(q, function(list){
+    if(searchInput.value.trim() !== q) return;
+    if(!list){ head.textContent = "地名検索に接続できませんでした"; return; }
+    if(!list.length){ head.textContent = "地名の候補は見つかりませんでした"; return; }
+    head.textContent = "地名で探す";
+    head.insertAdjacentHTML("afterend", list.map(function(p){
+      var nm = (p.display_name||"").split(",")[0];
+      return '<div class="s-item" data-lat="'+p.lat+'" data-lng="'+p.lon+'"><b>'+esc(nm)+'</b><span>'+esc(p.display_name||"")+'</span></div>';
+    }).join(""));
+  });
+}
+searchInput.addEventListener("keydown", function(e){
+  if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); geoSearchTop(); }
 });
 suggest.addEventListener("click", function(e){
+  if(e.target.closest("#geoHead")){ geoSearchTop(); return; }
   var it = e.target.closest(".s-item");
   if(!it) return;
   suggest.style.display = "none";
@@ -2601,26 +2825,32 @@ suggest.addEventListener("click", function(e){
 /* 登録時の住所検索 */
 var pickSearch  = document.getElementById("pickSearch");
 var pickSuggest = document.getElementById("pickSuggest");
-var pickTimer = null;
 pickSearch.addEventListener("input", function(){
   var q = pickSearch.value.trim();
-  clearTimeout(pickTimer);
-  if(q.length < 2){ pickSuggest.style.display = "none"; return; }
+  if(!q){ pickSuggest.style.display = "none"; return; }
+  pickSuggest.innerHTML = '<div class="p-item" data-go="1"><b>「'+esc(q)+'」を探す</b><span>決定キーでも探せます</span></div>';
+  pickSuggest.style.display = "block";
+});
+function geoSearchPick(){
+  var q = pickSearch.value.trim();
+  if(!q) return;
   pickSuggest.innerHTML = '<div class="p-msg">検索中…</div>';
   pickSuggest.style.display = "block";
-  pickTimer = setTimeout(function(){
-    nominatim(q, function(list){
-      if(pickSearch.value.trim() !== q) return;
-      if(!list){ pickSuggest.innerHTML = '<div class="p-msg">検索に接続できませんでした</div>'; return; }
-      if(!list.length){ pickSuggest.innerHTML = '<div class="p-msg">見つかりませんでした</div>'; return; }
-      pickSuggest.innerHTML = list.map(function(p){
-        var nm = (p.display_name || "").split(",")[0];
-        return '<div class="p-item" data-lat="'+p.lat+'" data-lng="'+p.lon+'"><b>'+esc(nm)+'</b><span>'+esc(p.display_name||"")+'</span></div>';
-      }).join("");
-    });
-  }, 700);
+  nominatim(q, function(list){
+    if(pickSearch.value.trim() !== q) return;
+    if(!list){ pickSuggest.innerHTML = '<div class="p-msg">検索に接続できませんでした</div>'; return; }
+    if(!list.length){ pickSuggest.innerHTML = '<div class="p-msg">見つかりませんでした</div>'; return; }
+    pickSuggest.innerHTML = list.map(function(p){
+      var nm = (p.display_name || "").split(",")[0];
+      return '<div class="p-item" data-lat="'+p.lat+'" data-lng="'+p.lon+'"><b>'+esc(nm)+'</b><span>'+esc(p.display_name||"")+'</span></div>';
+    }).join("");
+  });
+}
+pickSearch.addEventListener("keydown", function(e){
+  if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); geoSearchPick(); }
 });
 pickSuggest.addEventListener("click", function(e){
+  if(e.target.closest(".p-item[data-go]")){ geoSearchPick(); return; }
   var it = e.target.closest(".p-item");
   if(!it) return;
   pickSuggest.style.display = "none";
@@ -2629,17 +2859,33 @@ pickSuggest.addEventListener("click", function(e){
   toast("この位置でよければ「ここに登録」");
 });
 
+/* Nominatim の利用規約：1秒に1回まで・同じ問い合わせは控えを使う。
+   公開して使う人が増えると、守っていないと全員が使えなくなる（遮断される） */
+var geoLastAt = 0, geoQueue = Promise.resolve(), geoCache = {};
+function geoFetch(url){
+  if(geoCache[url]) return Promise.resolve(geoCache[url]);
+  var p = geoQueue.then(function(){
+    var wait = Math.max(0, geoLastAt + 1100 - Date.now());
+    return new Promise(function(res){ setTimeout(res, wait); });
+  }).then(function(){
+    geoLastAt = Date.now();
+    return fetch(url, { headers:{ "Accept":"application/json" } });
+  }).then(function(r){
+    if(!r.ok) throw new Error(r.status);
+    return r.json();
+  }).then(function(d){ geoCache[url] = d; return d; });
+  geoQueue = p.catch(function(){});
+  return p;
+}
 function nominatim(q, cb){
-  fetch("https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language=ja&q="
-        + encodeURIComponent(q), { headers:{ "Accept":"application/json" } })
-    .then(function(r){ return r.json(); })
+  geoFetch("https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language=ja&q="
+        + encodeURIComponent(q))
     .then(function(list){ cb(list || []); })
     .catch(function(){ cb(null); });
 }
 function reverseGeocode(lat, lng, cb){
-  fetch("https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&accept-language=ja&lat="
-        + lat + "&lon=" + lng, { headers:{ "Accept":"application/json" } })
-    .then(function(r){ return r.json(); })
+  geoFetch("https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&accept-language=ja&lat="
+        + (+lat).toFixed(6) + "&lon=" + (+lng).toFixed(6))
     .then(function(d){ cb(d && d.display_name ? tidyAddress(d.display_name) : ""); })
     .catch(function(){ cb(""); });
 }
@@ -2914,8 +3160,10 @@ if(window.visualViewport){
 }
 document.getElementById("addBtn").addEventListener("click", function(){
   if(!needOnline("聖地の登録")) return;
-  draft = null; editingId = null;
-  startPick("new");
+  needAgree(function(){
+    draft = null; editingId = null;
+    startPick("new");
+  });
 });
 document.getElementById("addCancel").addEventListener("click", function(){
   var back = pickReturn;
@@ -3267,9 +3515,9 @@ document.getElementById("fSave").addEventListener("click", function(){
       name: name.slice(0,80), work: (wks[0] || ""), works: wks,
       addr: fAddr.value.trim().slice(0,200), memo: fMemo.value.trim().slice(0,1000),
       lat: lat, lng: lng, author: nickname, author_id: myUid, edit_token: token, photos: urls
-    }, function(ok){
+    }, function(ok, status){
       saveBtn.textContent = "保存";
-      if(!ok){ toast("登録できませんでした。通信状況をご確認ください"); return; }
+      if(!ok){ toast(status === 429 ? RATE_MSG : "登録できませんでした。通信状況をご確認ください"); return; }
       formPage.style.display = "none";
       draft = null; editingId = null; pendingOrphan = null;
       chrome();
@@ -3442,6 +3690,7 @@ Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(c){
   });
 });
 function renderList(){
+  renderHome();
   var statsEl = document.getElementById("stats");
 
   var base = baseList();      // 作品のしぼりこみ・コース表示を反映した一覧
@@ -3509,6 +3758,105 @@ function renderList(){
   }).join("");
   updateSelBar();
 }
+
+/* ================= ホーム =================
+   数字はすべて既存のデータから数えているだけで、新しく持つものはない */
+function lastVisit(s){ var v = visitsOf(s); return v.length ? v[v.length-1] : ""; }
+/* いちばん最近訪問した聖地の写真。自分で撮ったものを優先する */
+function heroPhotoUrl(){
+  var best = "", bestDate = "";
+  shared.forEach(function(s){
+    var d = lastVisit(s);
+    if(!d || d <= bestDate) return;
+    var p = (logOf(s.id).photos || [])[0] || safePhotoUrl((s.photos || [])[0]);
+    if(!p) return;
+    bestDate = d; best = p;
+  });
+  return best;
+}
+function homeThumb(s){
+  var src = (logOf(s.id).photos || [])[0] || safePhotoUrl((s.photos || [])[0]);
+  return src ? '<img class="thumb" loading="lazy" src="'+esc(src)+'">' : '<div class="thumb ph">📍</div>';
+}
+function renderHome(){
+  var statsEl = document.getElementById("homeStats");
+  if(!statsEl) return;
+
+  var hp = document.getElementById("heroPhoto");
+  var url = heroPhotoUrl();
+  if(hp) hp.style.backgroundImage = url ? 'url("' + String(url).replace(/"/g, "%22") + '")' : "";
+
+  var vis = shared.filter(isVisited);
+  var works = [];
+  vis.forEach(function(s){ worksOf(s).forEach(function(w){ works.push(w); }); });
+  var seen = {}, nPref = 0;
+  vis.forEach(function(s){
+    var p = prefOf(s.addr);
+    if(p && !seen[p]){ seen[p] = 1; nPref++; }
+  });
+  var nPhoto = myPhotoUrls.length;   // みんなの写真に自分が入れたぶん
+  Object.keys(myLog).forEach(function(k){ nPhoto += (myLog[k].photos || []).length; });
+
+  var cells = [
+    { ic:"📍", label:"訪問した聖地", num:vis.length,                unit:"か所" },
+    { ic:"🎬", label:"作品",         num:mergedWorks(works).length, unit:"作品" },
+    { ic:"🗾", label:"都道府県",     num:nPref,                     unit:"" },
+    { ic:"📷", label:"撮った写真",   num:nPhoto,                    unit:"枚" }
+  ];
+  statsEl.innerHTML = cells.map(function(c){
+    return '<div class="hstat"><div class="ic">'+c.ic+'</div><div class="tx">'
+      + '<span>'+c.label+'</span><b>'+c.num+(c.unit ? '<i>'+c.unit+'</i>' : '')+'</b>'
+      + '</div></div>';
+  }).join("");
+
+  /* 最近の訪問（訪問した日が新しい順） */
+  var rc = document.getElementById("homeRecent");
+  if(rc){
+    var recent = vis.map(function(s){ return { s:s, d:lastVisit(s) }; })
+      .sort(function(a,b){ return a.d < b.d ? 1 : (a.d > b.d ? -1 : 0); })
+      .slice(0, 4);
+    rc.innerHTML = recent.length
+      ? recent.map(function(x){
+          var s = x.s;
+          var sub = worksOf(s).length ? workLabelHtml(s) : esc(s.addr || "作品未設定");
+          return '<div class="card" data-id="'+esc(s.id)+'">' + homeThumb(s)
+            + '<div class="info"><h4>'+esc(s.name)+'</h4><p>'+sub+'</p>'
+            + '<span class="b bv">'+esc(fmtDate(x.d))+' に訪問</span></div></div>';
+        }).join("")
+      : '<div class="hempty"><div class="big">👣</div>まだ訪問した聖地がありません<br>'
+        + 'マップやリストから聖地を開いて「訪問済みにする」を押すと、ここに出ます</div>';
+  }
+
+  /* みんなのコース（新しい順に3件） */
+  var cc = document.getElementById("homeCourses");
+  if(cc){
+    var top3 = courses.slice(0, 3);
+    cc.innerHTML = top3.length
+      ? top3.map(function(c){
+          var cnt = (c.spot_ids || []).filter(function(id){ return !!spotById(id); }).length;
+          return '<div class="hcourse" data-cid="'+esc(c.id)+'">'
+            + '<h4>'+newBadge(c)+esc(c.title)+'</h4>'
+            + '<div class="cmeta">' + avatarHtml(c.author_id, c.author)
+            + '<span>'+esc(displayName(c.author_id, c.author))+' ・ '+cnt+'か所</span></div></div>';
+        }).join("")
+      : '<div class="hempty"><div class="big">🚩</div>'
+        + (isOffline() ? '電波がつながっていません' : 'まだコースがありません<br>コースの画面から作ってみてください')
+        + '</div>';
+  }
+}
+document.getElementById("homeRecent").addEventListener("click", function(e){
+  var c = e.target.closest(".card");
+  if(c && c.dataset.id) openSheet(c.dataset.id);
+});
+document.getElementById("homeCourses").addEventListener("click", function(e){
+  var el = e.target.closest(".hcourse");
+  if(!el) return;
+  var c = courses.filter(function(x){ return String(x.id) === el.dataset.cid; })[0];
+  if(c) openCourse(c);
+});
+Array.prototype.forEach.call(document.querySelectorAll(".hmore"), function(b){
+  b.addEventListener("click", function(){ closeSheet(); showPage(b.dataset.go); });
+});
 
 /* ---------------- まとめて訪問済みにする ---------------- */
 var selectMode = false;
@@ -3617,8 +3965,8 @@ function sbLoadCourses(cb){
 function sbAddCourse(row, cb){
   fetch(sbBase() + "/rest/v1/courses",
         { method:"POST", headers: sbHeaders({ "Prefer":"return=minimal" }), body: JSON.stringify(row) })
-    .then(function(r){ cb(r.ok); })
-    .catch(function(){ cb(false); });
+    .then(function(r){ cb(r.ok, r.status); })
+    .catch(function(){ cb(false, 0); });
 }
 function sbUpdateCourse(id, token, row, cb){
   fetch(sbBase() + "/rest/v1/rpc/update_course",
@@ -3733,7 +4081,8 @@ function showCourseSheet(){
     + '<button class="act-edit" id="cvClose">表示を終了</button>'
     + (canDel ? '<button class="act-edit" id="cvEdit">内容を編集</button>' : '')
     + (canDel ? '<button class="act-del" id="cvDel">🗑</button>' : '')
-    + '</div>';
+    + '</div>'
+    + '<button class="report-link" id="cvReport">このコースの問題を報告する</button>';
   sheetBody.innerHTML = h;
   sheetBody.scrollTop = 0;
   sheet.style.transition = ""; sheet.style.transform = "";
@@ -3742,6 +4091,9 @@ function showCourseSheet(){
   sheetMask.style.opacity = "";
   document.getElementById("sClose").onclick = closeSheet;
   document.getElementById("cvClose").onclick = closeCourse;
+  document.getElementById("cvReport").onclick = function(){
+    openReport({ kind:"course", target:String(c.id), spot:null, name:c.title });
+  };
   var ce = document.getElementById("cvEdit");
   if(ce) ce.onclick = function(){ closeSheet(); openCourseEdit(c); };
   var dl = document.getElementById("cvDel");
@@ -3855,9 +4207,16 @@ function orderByNearest(ids){
   return out.map(function(s){ return s.id; });
 }
 /* 住所から都道府県・市区町村を取り出す */
+var PREFS = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県",
+  "茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県",
+  "新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県",
+  "三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県",
+  "鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県",
+  "福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
 function prefOf(a){
-  var m = String(a||"").match(/(東京都|北海道|京都府|大阪府|..県)/);
-  return m ? m[1] : "";
+  a = String(a || "");
+  for(var i=0;i<PREFS.length;i++){ if(a.indexOf(PREFS[i]) >= 0) return PREFS[i]; }
+  return "";
 }
 function cityOf(a){
   a = String(a||"");
@@ -3996,7 +4355,7 @@ function openCourseWorkPick(){
 document.getElementById("btnNewCourse").addEventListener("click", function(){
   if(!hasServer()){ toast("オンラインにつながっていません"); return; }
   if(shared.length < 2){ toast("聖地が2か所以上必要です"); return; }
-  openCourseStart();
+  needAgree(openCourseStart);
 });
 document.getElementById("cSort").addEventListener("click", function(){
   if(draftSteps.length < 3){ toast("3か所以上でつかえます"); return; }
@@ -4194,9 +4553,9 @@ document.getElementById("cSave").addEventListener("click", function(){
     leg_time:      legArray(draftLegM, draftSteps.length - 1),
     stay_time:     legArray(draftStay, draftSteps.length),
     author: nickname, author_id: myUid, edit_token: token
-  }, function(ok){
+  }, function(ok, status){
     btn.textContent = "投稿";
-    if(!ok){ toast("投稿できませんでした"); return; }
+    if(!ok){ toast(status === 429 ? RATE_MSG : "投稿できませんでした"); return; }
     coursePage2.style.display = "none";
     document.getElementById("nav").style.display = "flex";
     sbLoadCourses(function(){
@@ -4297,7 +4656,7 @@ function updateAdminState(){
     ? "入力済み。すべての聖地とコメントを消せます"
     : "なし。自分が登録したものだけ直せます";
   // 管理キーが入っている端末では最初から表示する
-  if(adminKey) showAdminRows();
+  if(adminKey){ showAdminRows(); updateReportsState(); }
 }
 
 function showAdminRows(){
@@ -4437,7 +4796,7 @@ document.getElementById("btnBackupAll").addEventListener("click", function(){
           var blob = new Blob([JSON.stringify(out, null, 2)], { type:"application/json" });
           var a2 = document.createElement("a");
           a2.href = URL.createObjectURL(blob);
-          a2.download = "seichi-all-" + new Date().toISOString().slice(0,10) + ".json";
+          a2.download = "seichi-all-" + today() + ".json";
           document.body.appendChild(a2); a2.click(); a2.remove();
           toast("聖地"+out.spots.length+"件・コメント"+out.comments.length+"件・コース"+out.courses.length+"件を保存しました");
         });
@@ -4463,18 +4822,18 @@ document.getElementById("restoreAllInput").addEventListener("change", function(e
     var spotRows = data.spots.map(function(s){
       return { id:s.id, created_at:s.created_at, name:s.name, work:s.work, addr:s.addr, memo:s.memo,
                lat:s.lat, lng:s.lng, author:s.author, author_id:s.author_id,
-               photos: Array.isArray(s.photos) ? s.photos : [], edit_token: randToken() };
+               photos: Array.isArray(s.photos) ? s.photos : [], edit_token: adminKey };
     });
     sbBulkInsert("spots", spotRows, function(ok1, n1){
       var cmtRows = (data.comments || []).map(function(c){
         return { id:c.id, spot_id:c.spot_id, user_id:c.user_id, name:c.name || "名無し",
-                 body:c.body, created_at:c.created_at, edit_token: randToken() };
+                 body:c.body, created_at:c.created_at, edit_token: adminKey };
       });
       sbBulkInsert("comments", cmtRows, function(ok2, n2){
         var crsRows = (data.courses || []).map(function(c){
           return { id:c.id, created_at:c.created_at, title:c.title, memo:c.memo, spot_ids:c.spot_ids,
                    author:c.author, author_id:c.author_id, leg_transport:c.leg_transport,
-                   leg_time:c.leg_time, stay_time:c.stay_time, edit_token: randToken() };
+                   leg_time:c.leg_time, stay_time:c.stay_time, edit_token: adminKey };
         });
         sbBulkInsert("courses", crsRows, function(ok3, n3){
           sbLoadProfiles(function(){
@@ -4505,7 +4864,7 @@ document.getElementById("btnExport").addEventListener("click", function(){
   var blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "seichi-backup-" + new Date().toISOString().slice(0,10) + ".json";
+  a.download = "seichi-backup-" + today() + ".json";
   document.body.appendChild(a); a.click(); a.remove();
   toast("バックアップを保存しました");
 });
@@ -4661,13 +5020,24 @@ document.getElementById("btnOrphans").addEventListener("click", openOrphans);
    ・キーは APP_VERSION と同じ文字列にすること
    ・初めてこのアプリを使う人には出さない（「変わったこと」は意味がないため） */
 var RELEASE_NOTES = {
-  "1.056": {
-    title: "電波がなくても、聖地が見られます",
+  "1.058": {
+    title: "困った投稿を報告できるようになりました",
     items: [
-      "一度読み込んだ聖地とコースを端末の中に控えるようにしました。圏外や電波の弱い場所でも、リストと訪問記録がそのまま見られます",
-      "圏外のときは、いつ読み込んだ内容かをリストの上に表示します。電波が戻ると自動で最新に更新されます",
-      "圏外では、聖地の登録・コメント・みんなの写真の投稿はできません（押すとお知らせが出ます）。訪問チェックはこれまでどおり記録できます",
-      "地図そのものは電波が必要です。圏外では表示されないことがあります"
+      "聖地・写真・コメント・コースに問題があったら、詳細画面の下の「問題を報告する」から運営者に知らせられます",
+      "設定に「利用規約とプライバシー」と「ご意見・不具合の報告」を追加しました",
+      "はじめて投稿するときに、投稿のルールを確認する画面が出ます",
+      "地名の検索は、決定キーか「地名で探す」を押したときに探すようになりました",
+      "朝9時より前に訪問済みにすると、前の日の日付で記録されてしまう不具合を直しました"
+    ]
+  },
+  "1.057": {
+    title: "ホーム画面ができました",
+    items: [
+      "アプリを開くと、まず「ホーム」が出ます。訪問した聖地・作品・都道府県・撮った写真の数が一目で分かります",
+      "「最近の訪問」に、直近で訪問済みにした聖地が並びます。タップするとそのまま詳細が開きます",
+      "いちばん最近訪問した聖地の写真が、ホームの一番上に大きく出ます",
+      "みんなのコースもホームから見られます",
+      "圏外でも、一度読み込んだ聖地とコースはそのまま見られます（v1.056）"
     ]
   }
 };
@@ -4723,6 +5093,310 @@ function syncVisitsOnce(){
     sbSetAdded(list[i++], true, next);
   })();
 }
+
+/* ================= 一般公開まわり =================
+   利用規約・プライバシー・投稿ルール、はじめて投稿するときの同意、通報とお問い合わせ */
+var KEY_AGREED = "conan-seichi-agreed";
+var TERMS_VERSION = "2026-10-01";   // 規約を大きく変えたら日付を変える（全員にもう一度同意を求める）
+var RATE_MSG = "短い時間に投稿が続いたため、いったん止めています。しばらくしてからお試しください";
+
+var dlgMask = document.getElementById("dlgMask");
+var dlgBox  = document.getElementById("dlgBox");
+function openDlg(html){
+  dlgBox.innerHTML = html;
+  dlgMask.style.display = "block";
+  dlgBox.style.display = "block";
+  dlgBox.scrollTop = 0;
+}
+function closeDlg(){
+  dlgMask.style.display = "none";
+  dlgBox.style.display = "none";
+  dlgBox.innerHTML = "";
+}
+dlgMask.addEventListener("click", closeDlg);
+
+/* ---- 文書 ---- */
+var RULES = [
+  "自分で撮った写真だけを載せてください。アニメの画面・漫画のページ・公式画像などは載せないでください",
+  "人の顔や車のナンバーがはっきり写った写真は載せないでください",
+  "住宅・私有地・立入禁止の場所は登録しないでください。自宅など、人に知られたくない場所も同じです",
+  "悪口、個人情報、宣伝、作品と関係のない投稿はしないでください",
+  "現地では、撮影禁止の場所に入らない・大声を出さない・お店や住民の方に迷惑をかけないなど、マナーを守ってください"
+];
+var DOCS = {
+  terms:
+    '<h2>このアプリについて</h2>'
+  + '<p>「聖地巡礼マップ」（以下「本アプリ」）は、作品の舞台となった場所（聖地）を地図で探し、訪問を記録するための無料のWebアプリです。個人が運営する<b>非公式のファンメイドアプリ</b>で、作品の原作者・出版社・制作会社などの権利者とは関係ありません。作品名などは各権利者の著作物・商標です。</p>'
+  + '<p>本アプリを使った時点で、この利用規約・プライバシーについて・投稿のルールに同意したものとみなします。</p>'
+  + '<h2>投稿について</h2>'
+  + '<ol>'
+  + '<li>聖地・写真・コメント・コース・ニックネーム・アイコン（以下「投稿」）は、本アプリを開いた全員に公開されます。</li>'
+  + '<li>投稿の著作権は投稿した人にあります。ただし運営者が、本アプリでの表示・保存・バックアップ・不具合の調査に必要な範囲で、無償で使うことを許可していただきます。</li>'
+  + '<li>他人の著作権・肖像権・プライバシーを侵害する投稿をしないでください。投稿によって起きたトラブルは、投稿した人の責任で解決していただきます。</li>'
+  + '<li>運営者は、規約や投稿のルールに反する、またはふさわしくないと判断した投稿を、予告なく削除できます。</li>'
+  + '</ol>'
+  + '<h2>禁止していること</h2>'
+  + '<ul>'
+  + '<li>法律や公序良俗に反すること</li>'
+  + '<li>他人の権利（著作権・肖像権・プライバシーなど）を侵害すること</li>'
+  + '<li>他人の悪口・嫌がらせ・なりすまし</li>'
+  + '<li>宣伝・勧誘・同じ内容のくり返し投稿</li>'
+  + '<li>サーバーに大きな負担をかけること、本アプリの運営を妨げること</li>'
+  + '<li>私有地や立入禁止の場所への立ち入りをすすめること</li>'
+  + '</ul>'
+  + '<h2>免責</h2>'
+  + '<ol>'
+  + '<li>聖地の場所・内容は利用者による投稿で、正確さは保証できません。お出かけの前に、ご自身で確認してください。</li>'
+  + '<li>聖地をたずねる際の事故やトラブルについて、運営者は責任を負いません。現地のルールとマナーを守ってください。</li>'
+  + '<li>訪問記録など端末の中に保存したデータは、ブラウザのデータ削除や機種変更で消えることがあります。設定の「バックアップを保存」で控えを取ってください。</li>'
+  + '<li>本アプリは予告なく内容を変更・停止・終了することがあります。</li>'
+  + '</ol>'
+  + '<h2>規約の変更</h2>'
+  + '<p>この規約は必要に応じて変更します。大きく変更したときは、次に投稿するときにあらためて同意をお願いします。日本の法律に従って解釈します。</p>'
+  + '<p class="dated">2026年10月1日 制定</p>',
+
+  privacy:
+    '<h2>このスマホの中だけに保存するもの</h2>'
+  + '<p>訪問日・自分だけのメモ・自分だけの写真・画面の設定は、このスマホのブラウザの中だけに保存します。運営者を含め、ほかの人には送られません。</p>'
+  + '<h2>サーバーに保存するもの</h2>'
+  + '<ul>'
+  + '<li><b>投稿</b>：聖地の名前・作品・住所・メモ・位置、写真、コメント、コース、ニックネーム、アイコン。全員に公開されます。</li>'
+  + '<li><b>端末ごとのID</b>：はじめて開いたときに作る、意味のない文字列です。投稿者の表示、利用者数の集計（最初と最後に開いた日時）に使います。名前・メールアドレス・電話番号などは集めていません。</li>'
+  + '<li><b>訪問済みにした聖地</b>：どの聖地を何人が訪問したかの人数を出すため、端末ごとのIDと聖地の組み合わせを保存します。訪問した日付は送りません。</li>'
+  + '<li><b>通報・お問い合わせの内容</b>：対応のために保存します。</li>'
+  + '<li><b>回線の目印</b>：短時間の大量投稿を防ぐため、IPアドレスを元に戻せない形（ハッシュ）に変えて使います。投稿の制限に使うものは1日で消し、通報・お問い合わせに付けたものは対応のために残します。</li>'
+  + '</ul>'
+  + '<p>写真は送る前に縮小し、撮影場所などの情報（Exif）を取り除いています。</p>'
+  + '<h2>使っている外部サービス</h2>'
+  + '<p>本アプリは次のサービスを使っています。表示や検索のために、IPアドレスなどの通信情報がそれぞれのサービスに届きます。</p>'
+  + '<ul>'
+  + '<li>Supabase（投稿と写真の保存）</li>'
+  + '<li>GitHub Pages（アプリの配信）</li>'
+  + '<li>jsDelivr・unpkg（地図の部品の配信）</li>'
+  + '<li>OpenFreeMap・国土地理院・CARTO（地図の画像）</li>'
+  + '<li>Nominatim / OpenStreetMap（地名の検索と、登録時の住所の取得。検索した言葉と位置が送られます）</li>'
+  + '<li>Googleマップ（「ルート案内」を押したときだけ）</li>'
+  + '</ul>'
+  + '<p>広告、アクセス解析ツール、Cookie による追跡は使っていません。</p>'
+  + '<h2>位置情報</h2>'
+  + '<p>現在地は、「現在地」ボタンや「近い順」を押したときだけ、このスマホの中で距離を計算するのに使います。サーバーには送りません。</p>'
+  + '<h2>削除のお願い・お問い合わせ</h2>'
+  + '<p>自分の投稿は、その投稿をしたスマホから削除できます（聖地・コース・写真）。それ以外の削除のお願いや、写っている・書かれているご本人からのご連絡は、各聖地の「問題を報告する」または設定の「ご意見・不具合の報告」からお送りください。いただいた内容に返信はできませんが、すべて運営者が確認します。</p>'
+  + '<p class="dated">2026年10月1日 制定</p>',
+
+  rules:
+    '<h2>投稿のルール</h2>'
+  + '<ul>' + RULES.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join("") + '</ul>'
+  + '<h2>困った投稿を見つけたら</h2>'
+  + '<p>聖地の詳細画面のいちばん下にある「この聖地の問題を報告する」、コメントの「報告」、コースの「このコースの問題を報告する」から知らせてください。運営者が確認し、必要に応じて削除します。</p>'
+  + '<h2>巡礼のマナー</h2>'
+  + '<ul>'
+  + '<li>聖地の多くは、ふだん人が暮らしたり働いたりしている場所です</li>'
+  + '<li>撮影は周りの人が写りこまないように。お店の中は許可を取ってから</li>'
+  + '<li>路上に長く立ち止まらない、ゴミは持ち帰る</li>'
+  + '</ul>'
+};
+var docPage = document.getElementById("docPage");
+function openDoc(which){
+  which = DOCS[which] ? which : "terms";
+  document.getElementById("docBody").innerHTML = DOCS[which];
+  document.getElementById("docBody").scrollTop = 0;
+  Array.prototype.forEach.call(document.querySelectorAll("#docTabs button"), function(b){
+    b.classList.toggle("on", b.dataset.doc === which);
+  });
+  docPage.style.display = "flex";
+}
+document.getElementById("docTabs").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-doc]");
+  if(b) openDoc(b.dataset.doc);
+});
+document.getElementById("docClose").addEventListener("click", function(){ docPage.style.display = "none"; });
+document.getElementById("btnTerms").addEventListener("click", function(){ openDoc("terms"); });
+
+/* ---- はじめて投稿するときの同意 ---- */
+function hasAgreed(){
+  try{ return localStorage.getItem(KEY_AGREED) === TERMS_VERSION; }catch(e){ return false; }
+}
+function needAgree(cb){
+  if(hasAgreed()){ cb(); return; }
+  openDlg(
+      '<h3>投稿の前に</h3>'
+    + '<p class="dsub">登録した聖地・写真・コメント・コースは、このアプリを使う全員に公開されます。次のことを守ってください。</p>'
+    + '<ul class="rules">' + RULES.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join("") + '</ul>'
+    + '<button class="dlg-link" id="agDoc">利用規約とプライバシーを読む</button>'
+    + '<div class="dlg-row"><button class="dno" id="agNo">やめる</button>'
+    + '<button class="dyes" id="agYes">同意して続ける</button></div>');
+  document.getElementById("agNo").onclick = closeDlg;
+  document.getElementById("agDoc").onclick = function(){ openDoc("terms"); };
+  document.getElementById("agYes").onclick = function(){
+    try{ localStorage.setItem(KEY_AGREED, TERMS_VERSION); }catch(e){}
+    closeDlg();
+    cb();
+  };
+}
+
+/* ---- 通報・お問い合わせ ---- */
+var REPORT_REASONS = {
+  spot:    ["場所が違う・もう無い", "住宅・私有地・立入禁止の場所", "不適切な内容", "ほかの聖地と重複している", "その他"],
+  photo:   ["人の顔や車のナンバーが写っている", "アニメ画像など他人の著作物", "不適切な写真", "その他"],
+  comment: ["悪口・嫌がらせ", "個人情報が書かれている", "宣伝・くり返し投稿", "その他"],
+  course:  ["不適切な内容", "宣伝・くり返し投稿", "その他"]
+};
+function sbReport(r, cb){
+  if(!hasServer()){ cb(false); return; }
+  fetch(sbBase() + "/rest/v1/rpc/submit_report",
+        { method:"POST", headers: sbHeaders(),
+          body: JSON.stringify({ p_kind:r.kind, p_target:r.target || null, p_spot:r.spot || null,
+                                 p_reason:r.reason, p_detail:r.detail || "", p_uid:myUid }) })
+    .then(function(res){ return res.ok ? res.json() : false; })
+    .then(function(ok){ cb(ok === true); })
+    .catch(function(){ cb(false); });
+}
+/* o = { kind, target, spot, name, photo }。聖地のときは「写真の問題」も選べる */
+function openReport(o){
+  if(!needOnline("報告")) return;
+  var kind = o.kind, reason = "";
+  var title = kind === "comment" ? "コメントを報告"
+            : kind === "course"  ? "コースを報告" : "聖地の問題を報告";
+  function render(){
+    var reasons = REPORT_REASONS[kind] || REPORT_REASONS.spot;
+    var h = '<h3>' + esc(title) + '</h3>'
+      + '<p class="dsub">' + esc(o.name || "") + '<br>運営者が確認し、必要に応じて直したり削除したりします。報告した人が誰かは公開されません。</p>';
+    if(o.kind === "spot" && o.photo){
+      h += '<div class="rsn" style="flex-direction:row;">'
+        +  '<button data-k="spot" class="'+(kind==="spot"?"on":"")+'" style="flex:1;text-align:center;">聖地の内容</button>'
+        +  '<button data-k="photo" class="'+(kind==="photo"?"on":"")+'" style="flex:1;text-align:center;">いま表示中の写真</button></div>';
+    }
+    h += '<div class="rsn" id="rpReasons">' + reasons.map(function(t){
+        return '<button data-r="'+esc(t)+'" class="'+(reason===t?"on":"")+'">'+esc(t)+'</button>';
+      }).join("") + '</div>'
+      + '<textarea id="rpDetail" maxlength="1000" placeholder="くわしく（任意）。正しい場所や、どの部分が問題かなど"></textarea>'
+      + '<div class="dlg-row"><button class="dno" id="rpNo">やめる</button>'
+      + '<button class="dyes" id="rpYes"'+(reason?'':' disabled')+'>送る</button></div>';
+    var keep = document.getElementById("rpDetail");
+    var detail = keep ? keep.value : "";
+    openDlg(h);
+    document.getElementById("rpDetail").value = detail;
+    Array.prototype.forEach.call(dlgBox.querySelectorAll("button[data-k]"), function(b){
+      b.onclick = function(){ kind = b.dataset.k; reason = ""; render(); };
+    });
+    Array.prototype.forEach.call(dlgBox.querySelectorAll("button[data-r]"), function(b){
+      b.onclick = function(){ reason = b.dataset.r; render(); };
+    });
+    document.getElementById("rpNo").onclick = closeDlg;
+    document.getElementById("rpYes").onclick = function(){
+      var btn = this;
+      btn.disabled = true; btn.textContent = "送信中…";
+      sbReport({ kind:kind, target: kind === "photo" ? o.photo : o.target, spot:o.spot,
+                 reason:reason, detail:(document.getElementById("rpDetail").value || "").trim() },
+        function(ok){
+          if(!ok){ btn.disabled = false; btn.textContent = "送る"; toast("送れませんでした。時間をおいてお試しください"); return; }
+          closeDlg();
+          toast("報告を送りました。ありがとうございます");
+        });
+    };
+  }
+  render();
+}
+document.getElementById("btnFeedback").addEventListener("click", function(){
+  if(!needOnline("お問い合わせ")) return;
+  openDlg(
+      '<h3>ご意見・不具合の報告</h3>'
+    + '<p class="dsub">運営者に直接届きます。返信はできないため、連絡先は書かないでください。投稿の削除のお願いは、その聖地の「問題を報告する」からのほうが早く対応できます。</p>'
+    + '<textarea id="fbText" maxlength="1000" placeholder="気づいたこと、ほしい機能、うまく動かないところなど" style="min-height:140px;"></textarea>'
+    + '<div class="dlg-row"><button class="dno" id="fbNo">やめる</button>'
+    + '<button class="dyes" id="fbYes">送る</button></div>');
+  document.getElementById("fbNo").onclick = closeDlg;
+  document.getElementById("fbYes").onclick = function(){
+    var t = (document.getElementById("fbText").value || "").trim();
+    if(!t){ toast("内容を入力してください"); return; }
+    var btn = this;
+    btn.disabled = true; btn.textContent = "送信中…";
+    sbReport({ kind:"feedback", reason:"ご意見", detail: t + "\n\n（v" + APP_VERSION + " / " + navigator.userAgent.slice(0,160) + "）" },
+      function(ok){
+        if(!ok){ btn.disabled = false; btn.textContent = "送る"; toast("送れませんでした。時間をおいてお試しください"); return; }
+        closeDlg();
+        toast("送りました。ありがとうございます");
+      });
+  };
+});
+
+/* ---- 管理者：届いた通報 ---- */
+var REPORT_KIND_LABEL = { spot:"聖地", photo:"写真", comment:"コメント", course:"コース", feedback:"ご意見" };
+function sbAdminRpc(fn, body, cb){
+  fetch(sbBase() + "/rest/v1/rpc/" + fn, { method:"POST", headers: sbHeaders(), body: JSON.stringify(body) })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(cb)
+    .catch(function(){ cb(null); });
+}
+function updateReportsState(){
+  var el = document.getElementById("reportsState");
+  if(!el || !adminKey || !hasServer()) return;
+  sbAdminRpc("count_open_reports", { p_token: adminKey }, function(n){
+    if(typeof n !== "number" || n < 0){ el.textContent = "未対応のものを見る"; return; }
+    el.innerHTML = n ? '<b style="color:var(--red)">未対応 ' + n + '件</b>' : "未対応はありません";
+  });
+}
+function openReports(showAll){
+  if(!adminKey){ toast("管理用の合言葉が必要です"); return; }
+  toast("読み込み中…");
+  sbAdminRpc("list_reports", { p_token: adminKey, p_all: !!showAll }, function(rows){
+    if(!Array.isArray(rows)){ toast("読み込めませんでした（SQLの実行と合言葉をご確認ください）"); return; }
+    var h = '<div class="sheet-pad"><div class="sheet-title"><h2>届いた通報</h2>'
+          + '<button class="closeX" id="sClose">×</button></div>'
+          + '<p class="myempty" style="margin-top:8px;">' + (showAll ? "対応済みも含めて表示しています" : "未対応のものだけ表示しています")
+          + '　<a href="#" id="rpToggle" style="font-weight:700;">' + (showAll ? "未対応だけにする" : "対応済みも見る") + '</a></p></div>'
+          + '<div style="padding:0 18px 24px;">';
+    if(!rows.length) h += '<p class="myempty">ありません</p>';
+    rows.forEach(function(r){
+      var spot = r.spot_id ? shared.filter(function(x){ return String(x.id) === String(r.spot_id); })[0] : null;
+      var course = r.kind === "course" ? courses.filter(function(x){ return String(x.id) === String(r.target); })[0] : null;
+      var what = spot ? spot.name : course ? course.title : (r.kind === "feedback" ? "" : "（もう無いか、見つかりません）");
+      h += '<div class="rep-row'+(r.resolved?' done':'')+'">'
+         + '<div class="rh"><span class="rk'+(r.kind==="feedback"?" fb":"")+'">'+esc(REPORT_KIND_LABEL[r.kind] || r.kind)+'</span>'
+         + '<span>'+esc(timeAgo(r.created_at))+'</span>'
+         + (r.same_count > 1 ? '<span style="color:var(--red);font-weight:800;">同じ対象に'+r.same_count+'件</span>' : '')
+         + '</div>'
+         + '<b>'+esc(r.reason)+(what ? '　<span style="font-weight:500;color:var(--sub);font-size:12.5px;">'+esc(what)+'</span>' : '')+'</b>'
+         + (r.detail ? '<p>'+esc(r.detail)+'</p>' : '')
+         + (r.kind === "photo" && safePhotoUrl(r.target)
+             ? '<img src="'+esc(safePhotoUrl(r.target))+'" alt="" style="width:96px;height:96px;object-fit:cover;border-radius:10px;margin-top:8px;">' : '')
+         + '<div class="ra">'
+         + (spot ? '<button data-open="'+esc(spot.id)+'">聖地を開く</button>' : '')
+         + (course ? '<button data-course="'+esc(course.id)+'">コースを開く</button>' : '')
+         + (r.resolved ? '' : '<button data-done="'+esc(r.id)+'">対応済みにする</button>')
+         + '</div></div>';
+    });
+    h += '</div>';
+    sheetBody.innerHTML = h;
+    sheetBody.scrollTop = 0;
+    sheet.style.transition = ""; sheet.style.transform = "";
+    sheet.style.display = "flex";
+    sheetMask.style.display = "block"; sheetMask.style.opacity = "";
+    document.getElementById("sClose").onclick = closeSheet;
+    document.getElementById("rpToggle").onclick = function(e){ e.preventDefault(); openReports(!showAll); };
+    Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-open]"), function(b){
+      b.onclick = function(){ openSheet(b.dataset.open); };
+    });
+    Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-course]"), function(b){
+      b.onclick = function(){
+        var c = courses.filter(function(x){ return String(x.id) === b.dataset.course; })[0];
+        if(c){ closeSheet(); openCourse(c); }
+      };
+    });
+    Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-done]"), function(b){
+      b.onclick = function(){
+        sbAdminRpc("resolve_report", { p_token: adminKey, p_id: b.dataset.done }, function(ok){
+          if(ok !== true){ toast("できませんでした"); return; }
+          toast("対応済みにしました");
+          updateReportsState();
+          openReports(showAll);
+        });
+      };
+    });
+  });
+}
+document.getElementById("btnReports").addEventListener("click", function(){ openReports(false); });
 
 /* ================= 起動 ================= */
 loadLocal();
