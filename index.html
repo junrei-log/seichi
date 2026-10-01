@@ -1208,7 +1208,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.058";
+var APP_VERSION = "1.059";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -3762,17 +3762,19 @@ function renderList(){
 /* ================= ホーム =================
    数字はすべて既存のデータから数えているだけで、新しく持つものはない */
 function lastVisit(s){ var v = visitsOf(s); return v.length ? v[v.length-1] : ""; }
-/* いちばん最近訪問した聖地の写真。自分で撮ったものを優先する */
+/* ホームの一番上は、いつも「青山剛昌ふるさと館」の写真にする。
+   聖地に登録されている1枚目を使い、まだ読み込めていないときは同じ写真のURLを直接使う */
+var HERO_SPOT_ID = "28d89cfc-4157-4f82-8b22-878116b39574";
+var HERO_FALLBACK = SUPABASE_URL + "/storage/v1/object/public/spot-photos/msr70sjjyb3yb9geui5.jpg";
 function heroPhotoUrl(){
-  var best = "", bestDate = "";
-  shared.forEach(function(s){
-    var d = lastVisit(s);
-    if(!d || d <= bestDate) return;
-    var p = (logOf(s.id).photos || [])[0] || safePhotoUrl((s.photos || [])[0]);
-    if(!p) return;
-    bestDate = d; best = p;
-  });
-  return best;
+  for(var i=0;i<shared.length;i++){
+    if(String(shared[i].id) === HERO_SPOT_ID){
+      var p = safePhotoUrl((shared[i].photos || [])[0]);
+      if(p) return p;
+      break;
+    }
+  }
+  return safePhotoUrl(HERO_FALLBACK);
 }
 function homeThumb(s){
   var src = (logOf(s.id).photos || [])[0] || safePhotoUrl((s.photos || [])[0]);
