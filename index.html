@@ -186,6 +186,45 @@
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .course-card .chips{display:flex;gap:6px;margin-top:10px;overflow-x:auto;}
   .course-card .chips span{flex:none;font-size:11px;background:var(--fill);color:var(--text2);border-radius:999px;padding:4px 10px;white-space:nowrap;}
+  .cinfo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .cinfo span{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;background:var(--fill);color:var(--text2);}
+  .cinfo .cprog{background:var(--redTint);color:var(--red);}
+  .cinfo .cdone{background:var(--red);color:#fff;}
+  /* コースを見ながらまわる */
+  .cprogress{margin-top:12px;}
+  .cprogress .pt{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);font-weight:700;}
+  .cprogress .pt b{color:var(--red);font-size:14px;}
+  .cnext{
+    display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;border-radius:14px;
+    background:var(--tint);
+  }
+  .cnext .nx{flex:1;min-width:0;}
+  .cnext .nx span{display:block;font-size:11px;font-weight:700;color:var(--tintText);}
+  .cnext .nx b{display:block;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cnext .nx i{font-style:normal;font-size:11.5px;color:var(--sub);}
+  .cnext a{
+    flex:none;background:var(--navy);color:#fff;border-radius:11px;padding:10px 13px;
+    font-size:13px;font-weight:800;text-decoration:none;
+  }
+  .croute{
+    display:block;text-align:center;margin-top:8px;padding:11px;border-radius:12px;
+    border:1px solid var(--line);font-size:13px;font-weight:700;color:var(--text);text-decoration:none;
+  }
+  .step .no.done{background:var(--card);color:var(--red);border:2px solid var(--red);}
+  .step .no.past{background:var(--dotoff);}
+  .step.here{background:var(--tint);border-radius:12px;margin:0 -8px;padding:10px 8px;}
+  .step .arrive{
+    flex:none;padding:8px 11px;border-radius:10px;background:var(--red);color:#fff;font-size:12.5px;font-weight:800;
+  }
+  .step .arrived{flex:none;font-size:11.5px;font-weight:800;color:var(--red);}
+  .incourse{padding:16px 18px 0;border-top:1px solid var(--line);margin-top:18px;}
+  .incourse h4{margin:0 0 8px;font-size:13px;font-weight:800;}
+  .incourse button{
+    display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 0;
+    border-bottom:1px solid var(--line);font-size:14px;font-weight:700;
+  }
+  .incourse button:last-child{border-bottom:none;}
+  .incourse button span{margin-left:auto;font-size:11.5px;color:var(--sub);font-weight:500;white-space:nowrap;}
   .newbtn{
     width:100%;background:var(--navy);color:#fff;border-radius:14px;padding:14px;
     font-size:15px;font-weight:700;margin-bottom:12px;
@@ -1208,7 +1247,7 @@
    Supabase の Settings → API から値をコピーして下の2行に貼り付け
    ============================================================ */
 /* 更新のたびにこの番号を上げると、端末が古い版を掴んでいても自動で読み直します */
-var APP_VERSION = "1.059";
+var APP_VERSION = "1.060";
 
 var SUPABASE_URL      = "https://nmokjvorgknrpmxsyxct.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_Njo2b4lQrTAtTHwQv23EnA_xqoAh7LR";
@@ -2343,6 +2382,18 @@ function openSheet(id){
   }
   h += '</div>';
 
+  // この聖地を通るコース（コースを見つけるきっかけにする）
+  var inCourses = courseView ? [] : coursesWith(s.id).slice(0, 5);
+  if(inCourses.length){
+    h += '<div class="incourse"><h4>この聖地を通るコース</h4>'
+       + inCourses.map(function(c){
+           var p = courseProgress(c);
+           return '<button data-incourse="'+esc(c.id)+'">🚩 '+esc(c.title)
+                + '<span>'+(c.spot_ids||[]).length+'か所'+(p.done ? '・'+p.done+'/'+p.total+'訪問済み' : '')+' ›</span></button>';
+         }).join("")
+       + '</div>';
+  }
+
   h += '<div class="cmt-sec">'
      + '<h4>コメント</h4>'
      + '<div id="cmtList"><p class="cmt-empty">読み込み中…</p></div>'
@@ -2467,6 +2518,12 @@ function openSheet(id){
   document.getElementById("sMyEdit").onclick = function(){ closeSheet(); openLogForm(s); };
 
   setupComments(s);
+  Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-incourse]"), function(b){
+    b.onclick = function(){
+      var c = courses.filter(function(x){ return String(x.id) === b.dataset.incourse; })[0];
+      if(c) openCourse(c);
+    };
+  });
   document.getElementById("sReport").onclick = function(){
     openReport({ kind:"spot", target:String(s.id), spot:s.id, name:s.name,
                  photo: photos.length ? photos[photoIndex] || photos[0] : "" });
@@ -3839,7 +3896,8 @@ function renderHome(){
           return '<div class="hcourse" data-cid="'+esc(c.id)+'">'
             + '<h4>'+newBadge(c)+esc(c.title)+'</h4>'
             + '<div class="cmeta">' + avatarHtml(c.author_id, c.author)
-            + '<span>'+esc(displayName(c.author_id, c.author))+' ・ '+cnt+'か所</span></div></div>';
+            + '<span>'+esc(displayName(c.author_id, c.author))+' ・ '+cnt+'か所</span></div>'
+            + courseInfoHtml(c) + '</div>';
         }).join("")
       : '<div class="hempty"><div class="big">🚩</div>'
         + (isOffline() ? '電波がつながっていません' : 'まだコースがありません<br>コースの画面から作ってみてください')
@@ -3997,6 +4055,106 @@ function courseSpots(){
   return (courseView.spot_ids || []).map(spotById).filter(Boolean);
 }
 
+/* ---- コースを見ながらまわる ----
+   進み具合は「訪問済みかどうか」（いつ行ったかは問わない）。
+   「次の聖地」は今日の動きで決める：今日まだどこも記録していなければ1番目から、
+   記録していれば、今日まだ記録していない最初の聖地 */
+function visitedToday(s){ return visitsOf(s).indexOf(today()) >= 0; }
+/* 今日の訪問を記録する。返り値：記録後の回数／0=今日はもう記録済み／-1=保存できなかった */
+function recordVisitToday(s){
+  var t = today(), r = ensureLog(s.id);
+  if(r.visits.indexOf(t) >= 0) return 0;
+  var first = r.visits.length === 0;
+  r.visits.push(t); r.visits = uniqSorted(r.visits);
+  if(!saveLog()) return -1;
+  if(first) sbSetAdded(s.id, true, function(){ renderList(); });
+  return r.visits.length;
+}
+function uniqSpots(c){
+  var seen = {}, out = [];
+  (c.spot_ids || []).forEach(function(id){
+    var s = spotById(id);
+    if(s && !seen[s.id]){ seen[s.id] = 1; out.push(s); }
+  });
+  return out;
+}
+function courseProgress(c){
+  var u = uniqSpots(c);
+  return { done: u.filter(isVisited).length, total: u.length };
+}
+/* 今日どこまで進んだかを、コースごとに覚えておく（同じ聖地を2回通る往復コースがあるため、
+   聖地の訪問記録だけでは何番目まで来たかが分からない） */
+var KEY_CSTEP = "conan-seichi-coursestep";
+var courseStep = {};
+try{ courseStep = JSON.parse(localStorage.getItem(KEY_CSTEP) || "{}") || {}; }catch(e){ courseStep = {}; }
+function stepOf(c){
+  var st = c && courseStep[c.id];
+  return (st && st.d === today()) ? st.i : null;
+}
+function setStep(c, i){
+  var t = today();
+  Object.keys(courseStep).forEach(function(k){ if(courseStep[k].d !== t) delete courseStep[k]; });
+  courseStep[c.id] = { d:t, i:i };
+  try{ localStorage.setItem(KEY_CSTEP, JSON.stringify(courseStep)); }catch(e){}
+}
+/* 次に向かう番号。全部終わっていたら -1 */
+function courseNextIndex(list, c){
+  var st = stepOf(c);
+  var i;
+  if(st !== null) i = st + 1;
+  else{
+    // 「着いた」を使わず詳細画面から訪問済みにした場合も拾う。先頭から、今日の記録が続くところまで
+    i = 0;
+    while(i < list.length && visitedToday(list[i])) i++;
+  }
+  return i >= list.length ? -1 : i;
+}
+/* コースのエリア（全部が同じ市区町村ならそれ、ちがえば都道府県） */
+function courseArea(c){
+  var u = uniqSpots(c);
+  if(!u.length) return "";
+  var cities = {}, prefs = {};
+  u.forEach(function(s){ cities[prefOf(s.addr) + cityOf(s.addr)] = 1; prefs[prefOf(s.addr)] = 1; });
+  var ck = Object.keys(cities), pk = Object.keys(prefs).filter(Boolean);
+  if(ck.length === 1 && cityOf(u[0].addr)) return prefOf(u[0].addr) + cityOf(u[0].addr);
+  return pk.join("・");
+}
+/* 現在地からいちばん近い聖地までの距離 */
+function courseDist(c){
+  if(!myPos) return null;
+  var best = null;
+  uniqSpots(c).forEach(function(s){ var d = distM(myPos, s); if(best === null || d < best) best = d; });
+  return best;
+}
+/* Googleマップのルート案内（現在地から、残りの聖地を順に）。経由地は9か所まで */
+function gmapsRoute(spots, c){
+  if(!spots.length) return "";
+  var pt = function(s){ return s.lat.toFixed(6) + "," + s.lng.toFixed(6); };
+  var list = spots.slice(0, 10);
+  var u = "https://www.google.com/maps/dir/?api=1&destination=" + pt(list[list.length-1]);
+  if(list.length > 1) u += "&waypoints=" + encodeURIComponent(list.slice(0, -1).map(pt).join("|"));
+  var legs = (c && c.leg_transport || []).filter(Boolean);
+  if(legs.length && legs.every(function(t){ return t === "徒歩"; })) u += "&travelmode=walking";
+  return u;
+}
+function coursesWith(id){
+  return courses.filter(function(c){
+    return (c.spot_ids || []).some(function(x){ return String(x) === String(id); });
+  });
+}
+
+/* 一覧のカードに出す「どこ・どれくらい遠い・どこまで行った」 */
+function courseInfoHtml(c){
+  var h = "";
+  var area = courseArea(c);
+  if(area) h += '<span>📍 ' + esc(area) + '</span>';
+  var d = courseDist(c);
+  if(d !== null) h += '<span>ここから ' + esc(fmtDist(d)) + '</span>';
+  var p = courseProgress(c);
+  if(p.total && p.done >= p.total) h += '<span class="cdone">✓ 全部まわった</span>';
+  else if(p.done) h += '<span class="cprog">' + p.done + ' / ' + p.total + ' 訪問済み</span>';
+  return h ? '<div class="cinfo">' + h + '</div>' : "";
+}
 function renderCourseList(){
   var el = document.getElementById("courseList");
   if(!el) return;
@@ -4013,6 +4171,7 @@ function renderCourseList(){
       + '<h4>'+newBadge(c)+esc(c.title)+'</h4>'
       + '<div class="cmeta">' + avatarHtml(c.author_id, c.author)
       + '<span>'+esc(displayName(c.author_id, c.author))+' ・ '+names.length+'か所 ・ '+esc(timeAgo(c.created_at))+'</span></div>'
+      + courseInfoHtml(c)
       + totalTag(c) + courseTags(c)
       + (c.memo ? '<p>'+esc(c.memo)+'</p>' : '')
       + '<div class="chips">' + names.map(function(n,i){ return '<span>'+(i+1)+'. '+esc(n)+'</span>'; }).join("") + '</div>'
@@ -4058,6 +4217,7 @@ function showCourseSheet(){
   if(!courseView) return;
   var c = courseView;
   var list = courseSpots();
+  var next = courseNextIndex(list, c);
   var canDel = !!courseTokens[c.id] || !!adminKey;
   var h = '<div class="sheet-pad">'
     + '<div class="sheet-title"><h2>'+esc(c.title)+'</h2><button class="closeX" id="sClose">×</button></div>'
@@ -4065,13 +4225,20 @@ function showCourseSheet(){
     + '<div><b>'+esc(displayName(c.author_id, c.author))+'</b><span> のコース　'+esc(timeAgo(c.created_at))+'</span></div></div>'
     + totalTag(c) + courseTags(c)
     + (c.memo ? '<p class="memo">'+esc(c.memo)+'</p>' : '')
+    + courseGuideHtml(c, list, next)
     + '</div>'
     + '<div class="sheet-pad">'
     + list.map(function(s,i){
         var st = (c.stay_time || [])[i] || "";
-        var row = '<div class="step" data-sid="'+esc(s.id)+'"><div class="no">'+(i+1)+'</div>'
+        var today_ = next < 0 || i < next;    // 今日のコースで通りすぎた地点
+        var noCls = today_ ? " done" : (isVisited(s) ? " past" : "");
+        var right = i === next
+          ? '<button class="arrive" data-arrive="'+i+'">着いた</button>'
+          : (today_ ? '<span class="arrived">✓ 今日</span>' : '');
+        var row = '<div class="step'+(i === next ? ' here' : '')+'" data-sid="'+esc(s.id)+'">'
+                + '<div class="no'+noCls+'">'+(today_ ? '✓' : (i+1))+'</div>'
                 + '<div class="sname"><b>'+esc(s.name)+'</b><span>'+workLabelHtml(s)
-                + (st ? ' ・ 滞在 '+esc(st) : '') + '</span></div></div>';
+                + (st ? ' ・ 滞在 '+esc(st) : '') + '</span></div>' + right + '</div>';
         if(i < list.length - 1){
           var lt = legText(c, i);
           row += '<div class="leg-view">' + (lt ? esc(lt) : "移動手段の記載なし") + '</div>';
@@ -4112,6 +4279,44 @@ function showCourseSheet(){
   Array.prototype.forEach.call(sheetBody.querySelectorAll(".step"), function(st){
     st.onclick = function(){ openSheet(st.dataset.sid); };
   });
+  Array.prototype.forEach.call(sheetBody.querySelectorAll("button[data-arrive]"), function(b){
+    b.onclick = function(ev){
+      ev.stopPropagation();
+      var idx = +b.dataset.arrive, s = list[idx];
+      if(!s) return;
+      if(recordVisitToday(s) < 0) return;
+      setStep(c, idx);
+      renderMarkers(); renderList(); renderCourseList();
+      showCourseSheet();
+      var after = courseNextIndex(list, c);
+      toast(after < 0 ? "コースを全部まわりました。おつかれさまでした！"
+                      : "「" + s.name + "」を記録しました。次は「" + list[after].name + "」");
+    };
+  });
+}
+/* 進み具合・次の聖地・ルート案内 */
+function courseGuideHtml(c, list, next){
+  if(!list.length) return "";
+  var p = courseProgress(c);
+  var h = '<div class="cprogress"><div class="pt"><span>進み具合</span><span><b>' + p.done + '</b> / ' + p.total + ' 訪問済み</span></div>'
+        + '<div class="bar"><i style="width:' + (p.total ? Math.round(p.done / p.total * 100) : 0) + '%"></i></div></div>';
+  if(next < 0){
+    h += '<div class="cnext"><div class="nx"><span>今日のコース</span><b>全部まわりました 🎉</b></div></div>';
+    return h;
+  }
+  var s = list[next];
+  var dist = myPos ? 'ここから ' + fmtDist(distM(myPos, s)) : '';
+  var leg = next > 0 ? legText(c, next - 1) : '';
+  h += '<div class="cnext"><div class="nx"><span>' + (next === 0 ? 'まずはここから' : '次の聖地') + '（' + (next + 1) + '番目）</span>'
+     + '<b>' + esc(s.name) + '</b>'
+     + ((dist || leg) ? '<i>' + esc([dist, leg].filter(Boolean).join(' ・ ')) + '</i>' : '')
+     + '</div><a href="' + esc(gmapsRoute([s], c)) + '" target="_blank" rel="noopener">ルート案内</a></div>';
+  var rest = list.slice(next);
+  if(rest.length > 1){
+    h += '<a class="croute" href="' + esc(gmapsRoute(rest, c)) + '" target="_blank" rel="noopener">'
+       + '残り' + rest.length + 'か所をGoogleマップで通して見る' + (rest.length > 10 ? '（先の10か所まで）' : '') + '</a>';
+  }
+  return h;
 }
 
 /* ---- コース作成 ---- */
@@ -5022,6 +5227,17 @@ document.getElementById("btnOrphans").addEventListener("click", openOrphans);
    ・キーは APP_VERSION と同じ文字列にすること
    ・初めてこのアプリを使う人には出さない（「変わったこと」は意味がないため） */
 var RELEASE_NOTES = {
+  "1.060": {
+    title: "コースを見ながら、まわりやすくなりました",
+    items: [
+      "コースを開くと「次の聖地」が大きく出ます。「ルート案内」を押すと、そのままGoogleマップで道案内が始まります",
+      "着いたら「着いた」を押すだけで訪問済みになり、次の聖地に進みます",
+      "残りの聖地をまとめてGoogleマップで見ることもできます",
+      "コースの一覧に、エリア・現在地からの距離・自分がどこまで行ったかが出ます",
+      "聖地の詳細に「この聖地を通るコース」が出るようになりました",
+      "ホームのいちばん上の写真が、ふるさと館になりました"
+    ]
+  },
   "1.058": {
     title: "困った投稿を報告できるようになりました",
     items: [
